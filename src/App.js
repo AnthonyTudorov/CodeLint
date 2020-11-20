@@ -67,18 +67,7 @@ export default function App() {
       if (linter === 'pylint') setErrors(parse(output));
     });
 
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state');
-
-    if (code !== null && state !== null) {
-      window.history.replaceState({}, document.titlere, '/');
-      Socket.emit('auth user', {
-        code,
-        state,
-      });
-    }
-    
+    window.history.replaceState({}, document.titlere, '/');
     Socket.emit('is logged in');
 
     return () => {

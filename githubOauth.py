@@ -29,6 +29,7 @@ def log_user_info(user_access_token):
                          user_access_token)
     db.session.add(model)
     db.session.commit()
+    session.permanent = True
     session['user_id'] = user_id
 
 
