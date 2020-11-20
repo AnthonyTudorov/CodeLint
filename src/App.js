@@ -24,6 +24,19 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState('');
 
   useEffect(() => {
+    Socket.on('logged in status', ({ logged_in, user_info}) => {
+      console.log(logged_in);
+      console.log(user_info);
+      if (logged_in === true) {
+        setUser(user_info['login']);
+        setIsLoggedIn(true);
+        Socket.emit('get repos');
+      }
+      else {
+        setIsLoggedIn(false);
+      }
+    });
+    
     Socket.on('user data', ({ login }) => {
       setUser(login);
       setIsLoggedIn(true);
@@ -54,17 +67,8 @@ export default function App() {
       if (linter === 'pylint') setErrors(parse(output));
     });
 
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state');
-
-    if (code !== null && state !== null) {
-      window.history.replaceState({}, document.title, '/');
-      Socket.emit('auth user', {
-        code,
-        state,
-      });
-    }
+    window.history.replaceState({}, document.titlere, '/');
+    Socket.emit('is logged in');
 
     return () => {
       Socket.close();
