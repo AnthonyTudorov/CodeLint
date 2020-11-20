@@ -1,5 +1,12 @@
 import mock_github_responses
 
+mock_session = {}
+
+mock_session_permenant = False
+
+def mock_token_hex(val=None):
+    return 54321
+
 class mock_request:
     sid = None
 
@@ -61,17 +68,17 @@ class mock_db_session:
         pass
         
 class mock_users:
-    def __init__(self, login, name, email, profile_image, sid, access_token):
+    def __init__(self, login, name, email, profile_image, user_id, access_token):
         self.login = login
         self.name = name
         self.email = email
         self.profile_image = profile_image
-        self.sid = sid
+        self.user_id = user_id
         self.access_token = access_token
 
     class query:
         @staticmethod
-        def filter_by(sid=None):
+        def filter_by(user_id=None):
             return mock_query()
             
 class mock_query:

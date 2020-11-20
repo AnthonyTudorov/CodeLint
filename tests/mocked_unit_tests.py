@@ -31,7 +31,7 @@ class mocked(unittest.TestCase):
             'state': 4321
         }
         
-        with patch('requests.post', mock_methods.mock_success_request_post), patch('requests.get', mock_methods.mock_success_request_get), patch('settings.db.session', mock_methods.mock_db_session), patch('models.Users', mock_methods.mock_users), patch('githubOauth.request', mock_methods.mock_request):
+        with patch('requests.post', mock_methods.mock_success_request_post), patch('requests.get', mock_methods.mock_success_request_get), patch('settings.db.session', mock_methods.mock_db_session), patch('models.Users', mock_methods.mock_users), patch('githubOauth.token_hex', mock_methods.mock_token_hex), patch('githubOauth.session.permenant', mock_methods.mock_session_permenant), patch('githubOauth.session', mock_methods.mock_session):
             githubOauth.auth_user(**INPUT)
             
     def test_get_user_data(self):
@@ -112,7 +112,7 @@ class mocked(unittest.TestCase):
             'name': 'tester',
             'email': 'tester@test.com',
             'profile_image': 'test.png',
-            'sid': 1234,
+            'user_id': 1234,
             'access_token': 4321
         }
         OUTPUT = str({
@@ -120,7 +120,7 @@ class mocked(unittest.TestCase):
             'name': 'tester',
             'email': 'tester@test.com',
             'profile_image': 'test.png',
-            'sid': 1234,
+            'user_id': 1234,
             'access_token': 4321
         })
         with patch('settings.db.Column', mock_methods.mock_coloumn), patch('settings.db.String', mock_methods.mock_string):
