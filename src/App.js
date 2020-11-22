@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import parse from 'html-react-parser';
 import { v4 as uuidv4 } from 'uuid';
 import Top from './Top';
@@ -7,6 +8,13 @@ import GithubOauth from './GithubOauth';
 import Socket from './Socket';
 import './styles.css';
 import loadingGif from './loading.gif';
+
+const GlobalStyle = createGlobalStyle`
+body {
+  background-color: ${(props) => (props.theme.mode === 'dark' ? '#111' : '#EEE')};
+  color: ${(props) => (props.theme.mode === 'dark' ? '#EEE' : '#111')};
+}
+`;
 
 export default function App() {
   const [code, setCode] = useState('');
@@ -24,19 +32,18 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState('');
 
   useEffect(() => {
-    Socket.on('logged in status', ({ logged_in, user_info}) => {
+    Socket.on('logged in status', ({ logged_in, user_info }) => {
       console.log(logged_in);
       console.log(user_info);
       if (logged_in === true) {
-        setUser(user_info['login']);
+        setUser(user_info.login);
         setIsLoggedIn(true);
         Socket.emit('get repos');
-      }
-      else {
+      } else {
         setIsLoggedIn(false);
       }
     });
-    
+
     Socket.on('user data', ({ login }) => {
       setUser(login);
       setIsLoggedIn(true);
@@ -108,7 +115,7 @@ export default function App() {
           console.log(default_branch);
           Socket.emit('get repo tree', {
             repo_url: url,
-            default_branch: default_branch,
+            default_branch,
           });
         }
       }
@@ -128,38 +135,49 @@ export default function App() {
       }
     });
   };
+  const [theme, setTheme] = useState({ mode: 'dark' });
 
   return (
-    <div className="body">
-      <div className="github">
-        <div className="user">{user}</div>
-        {!isLoggedIn && <GithubOauth />}
-      </div>
-      <Top
-        handleSelectedRepo={handleSelectedRepo}
-        selectedRepo={selectedRepo}
-        handleLinter={handleLinter}
-        linter={linter}
-        repos={repos}
-        handleRepoTree={handleRepoTree}
-        repoTreeFiles={repoTreeFiles}
-        selectedFile={selectedFile}
-      />
 
-      <div className="div-error">
-        <p className="error">{selectLinterError}</p>
-      </div>
+    <ThemeProvider theme={theme}>
+      <>
+        <GlobalStyle />
+        <div className="body">
+          <div className="github">
+            <div className="user">{user}</div>
+            {!isLoggedIn && <GithubOauth />}
+          </div>
+          <Top
+            handleSelectedRepo={handleSelectedRepo}
+            selectedRepo={selectedRepo}
+            handleLinter={handleLinter}
+            linter={linter}
+            repos={repos}
+            handleRepoTree={handleRepoTree}
+            repoTreeFiles={repoTreeFiles}
+            selectedFile={selectedFile}
+          />
 
-      <Editor
-        handleChange={handleChange}
-        code={code}
-      />
-      <button type="submit" className="lintbutton" onClick={handleClick}>{loading ? <img src={loadingGif} alt="loading" value="Lint!" /> : 'Lint!'}</button>
+          <div className="test">
+            <button onClick={(e) => setTheme(theme.mode === 'dark' ? { mode: 'light' } : { mode: 'dark' })} type="submit" className="test">Dark Mode!</button>
+          </div>
 
-      <br />
-      <div className="code">
-        {errors}
-      </div>
-    </div>
+          <div className="div-error">
+            <p className="error">{selectLinterError}</p>
+          </div>
+
+          <Editor
+            handleChange={handleChange}
+            code={code}
+          />
+          <button type="submit" className="lintbutton" onClick={handleClick}>{loading ? <img src={loadingGif} alt="loading" value="Lint!" /> : 'Lint!'}</button>
+
+          <br />
+          <div className="code">
+            {errors}
+          </div>
+        </div>
+      </>
+    </ThemeProvider>
   );
 }
