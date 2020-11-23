@@ -3,10 +3,28 @@
   src: url('/static/proximaNova.ttf');
 }
 
+:root {
+    --primary-color: #302AE6;
+    --secondary-color: #536390;
+    --font-color: #424242;
+    --bg-color: #fff;
+    --heading-color: #292922;
+}
+
+.test
+{
+    padding: 1px 40px;
+    right: 0.5px;
+    top: 29px;
+    position: absolute;
+}
+
 .App {
     text-align: left;
     height: 100%;
 }
+
+
 
 html, body {
     height: 98%;
