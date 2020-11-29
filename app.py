@@ -9,7 +9,7 @@ from markupsafe import escape
 from githubOauth import auth_user, get_user_data, get_user_repos
 from githubOauth import get_user_repo_tree, get_user_file_contents
 from settings import db, app
-from lint import lint_code
+from lint import lint_code, make_file
 
 socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins="*")
@@ -46,11 +46,12 @@ def on_is_logged_in():
         if models.Users.query.filter_by(user_id=user_id).first() is not None:
             socketio.emit('logged in status', {'logged_in': True, 'user_info': get_user_data(user_id)}, request.sid)
     else:
-        socketio.emit('logged in status', {'logged_in': False, 'user_info': None}, request.sid)
+        socketio.emit('user data', get_user_data(request.sid), request.sid)
 
 
 @socketio.on('store state')
 def on_store_state(data):
+    print(data)
     states.add(data['state'])
 
 
@@ -72,10 +73,14 @@ def on_get_file_contents(data):
 
 @socketio.on('lint')
 def code(data):
-    res = lint_code(data)
-    socketio.emit('output', res, request.sid)
+    file = make_file(data)
+    if 'fix' in data:
+        res = lint_code(file, True)
+        socketio.emit('fixed', res, request.sid)
+    else:
+        res = lint_code(file)
+        socketio.emit('output', res, request.sid)
     subprocess.run(['rm', '-r', f'./userfiles/{res["filename"]}'])
-
 
 if __name__ == '__main__':
     models.db.create_all()

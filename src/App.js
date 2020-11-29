@@ -25,8 +25,8 @@ export default function App() {
 
   useEffect(() => {
     Socket.on('logged in status', ({ logged_in, user_info}) => {
-      console.log(logged_in);
-      console.log(user_info);
+      console.log(`Logged in: ${logged_in}`);
+      console.log(`user_info: ${user_info}`);
       if (logged_in === true) {
         setUser(user_info['login']);
         setIsLoggedIn(true);
@@ -67,8 +67,15 @@ export default function App() {
       if (linter === 'pylint') setErrors(parse(output));
     });
 
-    window.history.replaceState({}, document.titlere, '/');
+     Socket.on('fixed', ({ linter, output, file_contents }) => {
+      setLoading(false);
+      setCode(file_contents)
+      if (linter === 'eslint') setErrors(parse(output));
+      if (linter === 'pylint') setErrors(parse(output));
+    });
+
     Socket.emit('is logged in');
+    window.history.replaceState({}, document.title, '/');
 
     return () => {
       Socket.close();
@@ -100,9 +107,6 @@ export default function App() {
   const handleSelectedRepo = ({ value }) => {
     setSelectedRepo(value);
     allRepoInfo.forEach(([repo_name, url, default_branch]) => {
-      console.log(repo_name);
-      console.log(url);
-      console.log(default_branch);
       if (value === repo_name) {
         if (url.includes(user)) {
           console.log(default_branch);
@@ -123,14 +127,28 @@ export default function App() {
           content_url: url,
         });
         if (value.includes('.py')) setLinter('pylint');
-
         if (value.includes('.js') || value.includes('.jsx')) setLinter('eslint');
       }
     });
   };
 
+  const handleFix = () => {
+     if (linter === '') {
+      setSelectLinterError('Please select a linter!');
+      return;
+    }
+    setLoading(true);
+    Socket.emit('lint', {
+      code,
+      linter,
+      uuid: uuidv4(),
+      fix: true
+    });
+  }
+
   return (
     <div className="body">
+      {console.log(user)}
       <div className="github">
         <div className="user">{user}</div>
         {!isLoggedIn && <GithubOauth />}
@@ -155,6 +173,7 @@ export default function App() {
         code={code}
       />
       <button type="submit" className="lintbutton" onClick={handleClick}>{loading ? <img src={loadingGif} alt="loading" value="Lint!" /> : 'Lint!'}</button>
+      <button type="submit" className="lintbutton" onClick={handleFix}>{loading ? <img src={loadingGif} alt="loading" value="Fix!" /> : 'Fix!'}</button>
 
       <br />
       <div className="code">

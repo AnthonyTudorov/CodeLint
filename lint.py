@@ -8,8 +8,7 @@ import re
 here = os.path.dirname(os.path.realpath(__file__))
 SUBDIR = "userfiles"
 
-
-def lint_code(data):
+def make_file(data):
     linter = data['linter']
     code = data['code']
     filename = data['uuid'] + ('.py' if linter == 'pylint' else '.js')
@@ -18,28 +17,44 @@ def lint_code(data):
     file = open(filepath, "w")
     file.write(code)
     file.close()
+    return {'linter': linter, 'filename': filename}
 
+def lint_code(data, fix=False):
+    linter = data['linter']
+    filename = data['filename']
     if linter == 'eslint':
-        return eslint(linter, filename)
+        return eslint(linter, filename, fix)
     elif linter == 'pylint':
-        return pylint(linter, filename)
+        return pylint(linter, filename, fix)
 
 
-def eslint(linter, filename):
-    result = subprocess.run(
-        ['eslint', '-f', 'html', f'./userfiles/{filename}'],
-        stdout=subprocess.PIPE)
-
+def eslint(linter, filename, fix=False):
+    if fix:
+        result = subprocess.run(
+            ['eslint', '-f', 'html', '--fix' ,f'./userfiles/{filename}'],
+            stdout=subprocess.PIPE)
+    else:
+        result = subprocess.run(
+            ['eslint', '-f', 'html', f'./userfiles/{filename}'],
+            stdout=subprocess.PIPE)
     result = result.stdout.decode("utf-8")
     result = result.replace('style="display:none"',
                             'style="display:table-row"')
     result = re.sub(r'\[\+\].*.js', 'eslint', result)
-    return {'linter': linter, 'output': result, 'filename': filename}
+
+    filepath = os.path.join(here, SUBDIR, filename)
+    file = open(filepath, "r")
+    file_contents = file.read()
+    return {'linter': linter, 'output': result, 'filename': filename, 'file_contents': file_contents}
 
 
-def pylint(linter, filename):
+def pylint(linter, filename, fix=False):
+    if fix:
+        subprocess.run(
+            ['yapf', '-i', f'./userfiles/{filename}'],
+            stdout=subprocess.PIPE)
     shell_ps = subprocess.Popen(('pylint', f'./userfiles/{filename}'),
-                          stdout=subprocess.PIPE)
+                              stdout=subprocess.PIPE)
     result = subprocess.check_output(('pylint-json2html'),
                                      stdin=shell_ps.stdout).decode("utf-8")
     try:
@@ -51,4 +66,7 @@ def pylint(linter, filename):
     except Exception as e:
         print(e)
 
-    return {'linter': linter, 'output': result, 'filename': filename}
+    filepath = os.path.join(here, SUBDIR, filename)
+    file = open(filepath, "r")
+    file_contents = file.read()
+    return {'linter': linter, 'output': result, 'filename': filename, 'file_contents': file_contents}
