@@ -49,6 +49,11 @@ def auth_user(code, state):
 
     log_user_info(access_token)
 
+def logout_user(user_id):
+    query = models.Users.query.filter_by(user_id=user_id).first()
+    if query is not None:
+        db.session.delete(query)
+        db.session.commit()
 
 def get_user_data(user_id):
     query = models.Users.query.filter_by(user_id=user_id).first()
