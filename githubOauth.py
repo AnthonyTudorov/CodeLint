@@ -79,8 +79,7 @@ def get_user_repos(user_id):
         'error': None
     }
 
-
-def get_user_repo_tree(user_id, repo_url, default_branch):
+def get_prev_commit(user_id, repo_url, default_branch):
     user_access_token = models.Users.query.filter_by(
         user_id=user_id).first().access_token
     headers = {
@@ -92,10 +91,28 @@ def get_user_repo_tree(user_id, repo_url, default_branch):
     if repo.status_code == 403:
         return {'tree': None, 'error': 'bad github token'}
     repo = repo.json()
+    return repo
+
+def get_user_repo_tree(user_id, repo_url, default_branch):
+    user_access_token = models.Users.query.filter_by(
+        user_id=user_id).first().access_token
+    headers = {
+        'Authorization': 'token ' + user_access_token,
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    repo = get_prev_commit(user_id, repo_url, default_branch)
     params = {'recursive': True}
     tree = requests.get(repo['commit']['tree']['url'],
                         params=params,
                         headers=headers)
+                        
+    #test stuff
+    files = [{'path': 'README.md', 'content': 'hello there'}]
+    commit_message = 'ayy'
+    commit_changes(user_id, repo_url, default_branch, files, commit_message)
+    
+    
+                        
     if tree.status_code == 403:
         return {'tree': None, 'error': 'bad github token'}
 
@@ -113,7 +130,7 @@ def get_user_file_contents(user_id, content_url):
     contents = requests.get(content_url, headers=headers)
     if contents.status_code == 403:
         return {'contents': None, 'error': 'bad github token'}
-
+    
     contents = contents.json()
     if 'content' not in contents:
         return {'contents': None, 'error': 'could not determine contents'}
@@ -122,3 +139,82 @@ def get_user_file_contents(user_id, content_url):
             'contents': base64.b64decode(contents['content']).decode("utf-8"),
             'error': None
         }
+
+def create_blob(user_id, repo_url, content):
+    user_access_token = models.Users.query.filter_by(
+        user_id=user_id).first().access_token
+    headers = {
+        'Authorization': 'token ' + user_access_token,
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    blob_url = repo_url + '/git/blobs'
+    data = {'content': content}
+    blob = requests.post(blob_url, headers=headers, content=content)
+    if blob.status_code == 403:
+        return {'blob_success': False, 'error': 'bad github token'}
+        
+    blob = blob.json()
+    return blob['sha']
+    
+def create_new_tree(user_id, repo_url, default_branch, files):
+    user_access_token = models.Users.query.filter_by(
+        user_id=user_id).first().access_token
+    headers = {
+        'Authorization': 'token ' + user_access_token,
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    repo = get_prev_commit(user_id, repo_url, default_branch)
+    params = {'recursive': True}
+    tree = requests.get(repo['commit']['tree']['url'],
+                        params=params,
+                        headers=headers)
+    if tree.status_code == 403:
+        return {'new_tree_success': False, 'error': 'bad github token'}
+        
+    tree = tree.json()
+    tree_update = []
+    for file in files:
+        for obj in tree['tree']:
+            if obj['path'] == file['path']:
+                blob_sha = create_blob(user_id, repo_url, file['content'])
+                obj['sha'] = blob_sha
+                tree_update.append(obj)
+                
+    new_tree_url = repo_url + '/git/trees'
+    data = {'tree': tree_update, 'base_tree': tree['sha']}
+    new_tree = request.post(new_tree_url, headers=headers, data=data)
+    if new_tree.status_code == 403:
+        return {'new_tree_success': False, 'error': 'bad github token'}
+        
+    return (new_tree['sha'], last_commit['sha'])
+
+def update_branch_reference(user_id, repo_url, default_branch, commit_sha):
+    user_access_token = models.Users.query.filter_by(
+        user_id=user_id).first().access_token
+    headers = {
+        'Authorization': 'token ' + user_access_token,
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    ref_update_url = repo_url + '/git/refs/' + default_branch
+    data = {'sha': commit_sha}
+    ref = requests.patch(ref_update_url, headers=headers, data=data)
+    if ref.status_code == 403:
+        return {'commit_success': False, 'error': 'bad github token'}
+    
+def commit_changes(user_id, repo_url, default_branch, files, commit_message):
+    new_tree_sha, old_commit_sha = create_new_tree(user_id, repo_url, default_branch, files)
+    user_access_token = models.Users.query.filter_by(
+        user_id=user_id).first().access_token
+    headers = {
+        'Authorization': 'token ' + user_access_token,
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    commit_url = repo_url + 'git/commits'
+    data = {'message': commit_message, 'tree': new_tree_sha, 'parent': [old_commit_sha]}
+    commit = request.post(commit_url, headers=headers, data=data)
+    if commit.status_code == 403:
+        return {'commit_success': False, 'error': 'bad github token'}
+    commit = commit.json()
+    update_branch_reference(user_id, repo_url, default_branch, commit['sha'])
+    
+    
