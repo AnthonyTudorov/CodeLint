@@ -6,7 +6,7 @@ import flask
 import flask_socketio
 from flask import request, session, redirect, url_for
 from markupsafe import escape
-from githubOauth import auth_user, get_user_data, get_user_repos
+from githubOauth import auth_user, logout_user, get_user_data, get_user_repos
 from githubOauth import get_user_repo_tree, get_user_file_contents
 from settings import db, app
 from lint import lint_code
@@ -48,6 +48,9 @@ def on_is_logged_in():
     else:
         socketio.emit('logged in status', {'logged_in': False, 'user_info': None}, request.sid)
 
+@socketio.on('logout')
+def on_logout():
+    logout_user(escape(session['user_id']))
 
 @socketio.on('store state')
 def on_store_state(data):
