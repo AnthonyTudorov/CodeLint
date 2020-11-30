@@ -75,12 +75,13 @@ def on_get_file_contents(data):
 def code(data):
     file = make_file(data)
     if 'fix' in data:
-        res = lint_code(file, True)
+        res = lint_code(file, data,True)
         socketio.emit('fixed', res, request.sid)
     else:
-        res = lint_code(file)
+        res = lint_code(file, data)
         socketio.emit('output', res, request.sid)
     subprocess.run(['rm', '-r', f'./userfiles/{res["filename"]}'])
+    subprocess.run(['rm', '-r', f'./userfiles/.{res["filename"]}'])
 
 if __name__ == '__main__':
     models.db.create_all()

@@ -3,21 +3,29 @@ import React from 'react';
 import 'react-dropdown/style.css';
 import './top.css';
 import Dropmenu from './Dropmenu';
+import loadingGif from "./loading.gif";
 
 export default function Top({
   handleLinter, handleSelectedRepo, linter, repos, handleRepoTree, repoTreeFiles,
-  selectedRepo, selectedFile,
+  selectedRepo, selectedFile, handleStyleguide, styleguide, loading
 }) {
   return (
     <>
       <div className="top">
-        <h2>Codelint</h2>
+        <h2>{loading ? <img height={25} width={25} src={loadingGif} alt="loading"/> : 'Codelint'}</h2>
         <Dropmenu
           handleDropdown={handleLinter}
           value={linter}
           className="dropdown"
           placeholder="Select a linter"
           options={['pylint', 'eslint']}
+        />
+        <Dropmenu
+          handleDropdown={handleStyleguide}
+          value={styleguide}
+          className="dropdown"
+          placeholder="Select a styling guide"
+          options={['airbnb', 'standard', 'google']}
         />
         {repos.length !== 0
           ? (

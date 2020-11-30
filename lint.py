@@ -11,42 +11,55 @@ SUBDIR = "userfiles"
 def make_file(data):
     linter = data['linter']
     code = data['code']
+    uuid = data['uuid']
     filename = data['uuid'] + ('.py' if linter == 'pylint' else '.js')
 
     filepath = os.path.join(here, SUBDIR, filename)
     file = open(filepath, "w")
     file.write(code)
     file.close()
+
+    if linter == 'eslint':
+        eslintrc = read_file('config', '.eslintrc.js')
+        filepath = os.path.join(here, SUBDIR, f'.{filename}')
+        file = open(filepath, "w")
+        file.write(eslintrc.replace('STYLEGUIDEHERE', data['styleguide']))
+        file.close()
+
     return {'linter': linter, 'filename': filename}
 
-def lint_code(data, fix=False):
-    linter = data['linter']
-    filename = data['filename']
+def lint_code(file, data, fix=False):
+    linter = file['linter']
+    filename = file['filename']
+    styleguide = data['styleguide']
     if linter == 'eslint':
-        return eslint(linter, filename, fix)
+        return eslint(linter, filename, styleguide, fix)
     elif linter == 'pylint':
         return pylint(linter, filename, fix)
 
 
-def eslint(linter, filename, fix=False):
+def eslint(linter, filename, styleguide, fix=False):
     if fix:
         result = subprocess.run(
-            ['eslint', '-f', 'html', '--fix' ,f'./userfiles/{filename}'],
+            ['eslint', '-c', f'./userfiles/.{filename}' ,'-f', 'html', '--fix' ,f'./userfiles/{filename}'],
             stdout=subprocess.PIPE)
     else:
         result = subprocess.run(
-            ['eslint', '-f', 'html', f'./userfiles/{filename}'],
+            ['eslint', '-c', f'./userfiles/.{filename}', '-f', 'html', f'./userfiles/{filename}'],
             stdout=subprocess.PIPE)
     result = result.stdout.decode("utf-8")
     result = result.replace('style="display:none"',
                             'style="display:table-row"')
     result = re.sub(r'\[\+\].*.js', 'eslint', result)
 
-    filepath = os.path.join(here, SUBDIR, filename)
-    file = open(filepath, "r")
-    file_contents = file.read()
+    file_contents = read_file(SUBDIR, filename)
     return {'linter': linter, 'output': result, 'filename': filename, 'file_contents': file_contents}
 
+
+def read_file(location, filename):
+    filepath = os.path.join(here, location, filename)
+    file = open(filepath, "r")
+    return file.read()
 
 def pylint(linter, filename, fix=False):
     if fix:

@@ -6,13 +6,12 @@ import Editor from './Editor';
 import GithubOauth from './GithubOauth';
 import Socket from './Socket';
 import './styles.css';
-import loadingGif from './loading.gif';
 
 export default function App() {
   const [code, setCode] = useState('');
   const [linter, setLinter] = useState('');
   const [errors, setErrors] = useState('');
-  const [selectLinterError, setSelectLinterError] = useState('');
+  const [promptError, setPromptError] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -22,6 +21,7 @@ export default function App() {
   const [repoTree, setRepoTree] = useState([]);
   const [repoTreeFiles, setRepoTreeFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState('');
+  const [styleguide, setStyleguide] = useState('')
 
   useEffect(() => {
     Socket.on('logged in status', ({ logged_in, user_info}) => {
@@ -88,7 +88,11 @@ export default function App() {
 
   const handleClick = () => {
     if (linter === '') {
-      setSelectLinterError('Please select a linter!');
+      setPromptError('Please select a linter!');
+      return;
+    }
+    if (styleguide === '') {
+      setPromptError('Please select a style guide!');
       return;
     }
     setLoading(true);
@@ -96,12 +100,13 @@ export default function App() {
       code,
       linter,
       uuid: uuidv4(),
+      styleguide
     });
   };
 
   const handleLinter = ({ value }) => {
     setLinter(value);
-    setSelectLinterError('');
+    setPromptError('');
   };
 
   const handleSelectedRepo = ({ value }) => {
@@ -134,7 +139,11 @@ export default function App() {
 
   const handleFix = () => {
      if (linter === '') {
-      setSelectLinterError('Please select a linter!');
+      setPromptError('Please select a linter!');
+      return;
+     }
+     if (styleguide === '') {
+      setPromptError('Please select a style guide!');
       return;
     }
     setLoading(true);
@@ -146,9 +155,13 @@ export default function App() {
     });
   }
 
+  const handleStyleguide = ({ value }) => {
+    setStyleguide(value)
+    setPromptError('');
+  }
+
   return (
     <div className="body">
-      {console.log(user)}
       <div className="github">
         <div className="user">{user}</div>
         {!isLoggedIn && <GithubOauth />}
@@ -162,18 +175,22 @@ export default function App() {
         handleRepoTree={handleRepoTree}
         repoTreeFiles={repoTreeFiles}
         selectedFile={selectedFile}
+        handleStyleguide={handleStyleguide}
+        styleguide={styleguide}
+        loading={loading}
       />
 
-      <div className="div-error">
-        <p className="error">{selectLinterError}</p>
+      <div className={loading ? ""
+          : "div-error"}>
+        <p className="error">{promptError}</p>
       </div>
 
       <Editor
         handleChange={handleChange}
         code={code}
       />
-      <button type="submit" className="lintbutton" onClick={handleClick}>{loading ? <img src={loadingGif} alt="loading" value="Lint!" /> : 'Lint!'}</button>
-      <button type="submit" className="lintbutton" onClick={handleFix}>{loading ? <img src={loadingGif} alt="loading" value="Fix!" /> : 'Fix!'}</button>
+      <button type="submit" className="lintbutton" onClick={handleClick}>Lint!</button>
+      <button type="submit" className="lintbutton" onClick={handleFix}>Fix!</button>
 
       <br />
       <div className="code">
