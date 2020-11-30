@@ -46,7 +46,7 @@ def on_is_logged_in():
         if models.Users.query.filter_by(user_id=user_id).first() is not None:
             socketio.emit('logged in status', {'logged_in': True, 'user_info': get_user_data(user_id)}, request.sid)
     else:
-        socketio.emit('user data', get_user_data(request.sid), request.sid)
+        socketio.emit('logged in status', {'logged_in': False, 'user_info': None}, request.sid)
 
 @socketio.on('logout')
 def on_logout():
@@ -54,7 +54,6 @@ def on_logout():
 
 @socketio.on('store state')
 def on_store_state(data):
-    print(data)
     states.add(data['state'])
 
 
