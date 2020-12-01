@@ -21,13 +21,13 @@ import models
 def main():
     github_code = request.args.get('code')
     state = request.args.get('state')
+    print("hi")
     if state is not None and github_code is not None:
         if state not in states:
             print(f'state: {state} does not match any waiting states')
         else:
             auth_user(github_code, state)
     return flask.render_template('index.html')
-
 
 @socketio.on('connect')
 def on_connect():
@@ -47,6 +47,18 @@ def on_is_logged_in():
             socketio.emit('logged in status', {'logged_in': True, 'user_info': get_user_data(user_id)}, request.sid)
     else:
         socketio.emit('logged in status', {'logged_in': False, 'user_info': None}, request.sid)
+
+@socketio.on('auth user')
+def auth(data):
+    github_code = data['code']
+    state = data['state']
+    if state is not None and github_code is not None:
+        if state not in states:
+            print(f'state: {state} does not match any waiting states')
+        else:
+            auth_user(github_code, state)
+
+
 
 @socketio.on('logout')
 def on_logout():
@@ -78,9 +90,11 @@ def code(data):
     file = make_file(data)
     if 'fix' in data:
         res = lint_code(file, data,True)
+        res['tab'] = data['index']
         socketio.emit('fixed', res, request.sid)
     else:
         res = lint_code(file, data)
+        res['tab'] = data['index']
         socketio.emit('output', res, request.sid)
     subprocess.run(['rm', '-r', f'./userfiles/{res["filename"]}'])
     subprocess.run(['rm', '-r', f'./userfiles/.{res["filename"]}'])
