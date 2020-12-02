@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
+import storage from 'local-storage-fallback'
 import parse from 'html-react-parser';
 import { v4 as uuidv4 } from 'uuid';
 import Top from './Top';
@@ -8,6 +9,7 @@ import GithubOauth from './GithubOauth';
 import Socket from './Socket';
 import './styles.css';
 import loadingGif from './loading.gif';
+import { get } from 'react-scroll/modules/mixins/scroller';
 
 const GlobalStyle = createGlobalStyle`
 body {
@@ -135,7 +137,16 @@ export default function App() {
       }
     });
   };
-  const [theme, setTheme] = useState({ mode: 'light' });
+  const [theme, setTheme] = useState(getInitialTheme);
+  useEffect(()=>{
+    storage.setItem('theme', JSON.stringify(theme))
+  }, [theme])
+
+  function getInitialTheme()
+  {
+    const savedTheme = storage.getItem('theme')
+    return savedTheme ? JSON.parse(savedTheme) : { mode: 'light'}
+  }
 
   return (
 
