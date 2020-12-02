@@ -10,7 +10,7 @@ export default function GithubOauth() {
       state,
     });
     window.location = `${'https://github.com/login/oauth/authorize?client_id=9cbfb21ec85ff80e7da7&redirect_uri='
-            + 'http://localhost:8080/&state='}${state}&scope=repo`;
+            + 'http://localhost:3000/&state='}${state}&scope=repo`;
   }
 
   return (

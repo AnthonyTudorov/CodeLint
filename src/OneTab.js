@@ -7,15 +7,11 @@ import GithubOauth from './GithubOauth';
 import Socket from './Socket';
 import './styles.css';
 
-export default function OneTab({index, currentTab}) {
+export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) {
   const [code, setCode] = useState(localStorage.getItem(`code${index}` || ''));
   const [linter, setLinter] = useState(localStorage.getItem(`linter${index}`) || '');
-  const [errors, setErrors] = useState(localStorage.getItem(`errors${index}`) &&
-                                       parse(localStorage.getItem(`errors${index}`)) || '');
   const [promptError, setPromptError] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
   const [repos, setRepos] = useState([]);
   const [allRepoInfo, setAllRepoInfo] = useState([]);
   const [selectedRepo, setSelectedRepo] = useState('');
@@ -25,20 +21,23 @@ export default function OneTab({index, currentTab}) {
   const [styleguide, setStyleguide] = useState(localStorage.getItem(`styleguide${index}`) || '')
 
   useEffect(() => {
+    Socket.emit('is logged in');
+
     Socket.on('logged in status', ({ logged_in, user_info}) => {
       if (logged_in === true) {
-        setUser(user_info['login']);
-        setIsLoggedIn(true);
+        console.log("logged in status")
+        updateUser(user_info['login'])
+        updateLoggedIn(true)
         Socket.emit('get repos');
       }
       else {
-        setIsLoggedIn(false);
+        updateLoggedIn(false)
       }
     });
 
     Socket.on('user data', ({ login }) => {
-      setUser(login);
-      setIsLoggedIn(true);
+      updateUser(login)
+      updateLoggedIn(true)
       Socket.emit('get repos');
     });
 
@@ -76,18 +75,7 @@ export default function OneTab({index, currentTab}) {
       localStorage.setItem(`errors${tab}`, output)
     });
 
-    Socket.emit('is logged in');
-
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state');
-    if (code !== null && state !== null) {
-      window.history.replaceState({}, document.title, '/');
-      Socket.emit('auth user', {
-        code,
-        state,
-      });
-    }
+    window.history.replaceState({}, document.title, '/');
 
     return () => {
       Socket.close();
@@ -181,10 +169,6 @@ export default function OneTab({index, currentTab}) {
   const element = () => {
     return (
         <div className="body">
-      <div className="github">
-        <div className="user">{user}</div>
-        {!isLoggedIn && <GithubOauth />}
-      </div>
       <Top
         handleSelectedRepo={handleSelectedRepo}
         selectedRepo={selectedRepo}
