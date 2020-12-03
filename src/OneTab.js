@@ -7,7 +7,7 @@ import GithubOauth from './GithubOauth';
 import Socket from './Socket';
 import './styles.css';
 
-export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) {
+export default function OneTab({index, currentTab, updateUser, updateLoggedIn, user}) {
   const [code, setCode] = useState(localStorage.getItem(`code${index}` || ''));
   const [linter, setLinter] = useState(localStorage.getItem(`linter${index}`) || '');
   const [promptError, setPromptError] = useState('');
@@ -19,13 +19,12 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) 
   const [repoTreeFiles, setRepoTreeFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState('');
   const [styleguide, setStyleguide] = useState(localStorage.getItem(`styleguide${index}`) || '')
+  const [currentTabErrors, setCurrentTabErrors] = useState(localStorage.getItem(`errors${index}`) &&
+                                       parse(localStorage.getItem(`errors${index}`)) || '')
 
   useEffect(() => {
-    Socket.emit('is logged in');
-
     Socket.on('logged in status', ({ logged_in, user_info}) => {
       if (logged_in === true) {
-        console.log("logged in status")
         updateUser(user_info['login'])
         updateLoggedIn(true)
         Socket.emit('get repos');
@@ -47,6 +46,7 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) 
     });
 
     Socket.on('repo tree', (data) => {
+      console.log("repo tree")
       setRepoTree(data);
       const arr = [];
       data.tree.forEach(({ path, type }) => {
@@ -59,22 +59,23 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) 
       setCode(data.contents);
     });
 
-    Socket.on('output', ({ linter, output, tab }) => {
-      setLoading(false);
-      setErrors(parse(output));
-       console.log(`errors${tab}`)
+     Socket.on('output', ({ linter, output, tab }) => {
       localStorage.setItem(`errors${tab}`, output)
+      setLoading(false);
+      setCurrentTabErrors(parse(output));
+
     });
 
      Socket.on('fixed', ({ linter, output, file_contents, tab }) => {
+       console.log(`code${tab}`)
+      localStorage.setItem(`code${tab}`, file_contents);
+      localStorage.setItem(`errors${tab}`, output)
       setLoading(false);
       setCode(file_contents)
-      localStorage.setItem(`code${index}`, file_contents);
-      setErrors(parse(output));
-      console.log(`errors${tab}`)
-      localStorage.setItem(`errors${tab}`, output)
+      setCurrentTabErrors(parse(output));
     });
 
+    Socket.emit('is logged in');
     window.history.replaceState({}, document.title, '/');
 
     return () => {
@@ -114,14 +115,15 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) 
 
   const handleSelectedRepo = ({ value }) => {
     setSelectedRepo(value);
+    let found = false;
     allRepoInfo.forEach(([repo_name, url, default_branch]) => {
-      if (value === repo_name) {
+      if (value === repo_name && !found) {
         if (url.includes(user)) {
-          console.log(default_branch);
           Socket.emit('get repo tree', {
             repo_url: url,
             default_branch: default_branch,
           });
+          found = true
         }
       }
     });
@@ -161,8 +163,8 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) 
   }
 
   const handleStyleguide = ({ value }) => {
-    setStyleguide(value)
     localStorage.setItem(`styleguide${index}`, value);
+    setStyleguide(value)
     setPromptError('');
   }
 
@@ -197,7 +199,7 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn}) 
 
       <br />
           { currentTab === index ? <div className="code">
-        {localStorage.getItem(`errors${index}`) ? parse(localStorage.getItem(`errors${index}`)) : null}
+        {localStorage.getItem(`errors${index}`) && parse(localStorage.getItem(`errors${index}`)) || null}
       </div> : null}
     </div>
     );

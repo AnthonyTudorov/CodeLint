@@ -82,7 +82,6 @@ def code(data):
         socketio.emit('fixed', res, request.sid)
     else:
         res = lint_code(file, data)
-        print(res)
         res['tab'] = data['index']
         socketio.emit('output', res, request.sid)
     subprocess.run(['rm', '-r', f'./userfiles/{res["filename"]}'])

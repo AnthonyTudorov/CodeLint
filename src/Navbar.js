@@ -28,8 +28,6 @@ export default function Navbar({user, isLoggedIn}) {
   const classes = useStyles();
   return (
       <div className={classes.root} id="navbar">
-          {console.log(user)}
-          {console.log(isLoggedIn)}
         <AppBar className={classes.navbar} position="static">
           <Toolbar>
             <Typography variant="h6" className={classes.title}>

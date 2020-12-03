@@ -21,6 +21,9 @@ export default function App() {
 
   useEffect(() => {
     Socket.emit('is logged in');
+    const oldTabs = localStorage.getItem("tabs")
+    if (oldTabs)
+      setTabs(oldTabs.split(","))
   }, []);
 
   const handleChange = (e, val) => {
@@ -38,14 +41,31 @@ export default function App() {
 
   const handleNewFile = () => {
     if (filename === ""){
-      setTabs((prestate) => [...prestate, `File ${uuidv4().substr(0,5)}`]);
+      const temp = uuidv4().substr(0,5)
+      setTabs((prestate) => [...prestate, `File ${temp}`]);
+      localStorage.setItem("tabs", `${tabs},File ${temp}`)
       return;
     }
     setTabs((prestate) => [...prestate, filename]);
+    localStorage.setItem("tabs", `${tabs},${filename}`)
   }
 
   const handleFilename = (e) => {
     setFileName(e.target.value);
+  }
+
+  const handleKeyPress = (e) => {
+     if (e.key === 'Enter') {
+      if (filename === '') {
+        const temp = uuidv4().substr(0,5)
+        setTabs((prestate) => [...prestate, `File ${temp}`]);
+        localStorage.setItem("tabs", `${tabs},File ${temp}`)
+        return;
+      }
+      setTabs((prestate) => [...prestate, filename]);
+      localStorage.setItem("tabs", `${tabs},${filename}`)
+    }
+     setFileName(e.target.value);
   }
 
   const useStyles = makeStyles((theme) => ({
@@ -69,7 +89,7 @@ export default function App() {
           {tabs.map((item) => {
             return <Tab label={item} />
           })}
-          <form className={classes.root}  noValidate autoComplete="off">
+          <form className={classes.root} type="submit" onKeyPress={handleKeyPress} noValidate autoComplete="off">
             <TextField className={classes.input} value={filename} id="outlined-basic" label="filename"
                        variant="filled" onChange={handleFilename} />
           </form>
@@ -78,9 +98,10 @@ export default function App() {
           </IconButton>
         </Tabs>
       </AppBar>
-      <OneTab updateUser={updateUser} updateLoggedIn={updateLoggedIn} index={0} currentTab={value} />
-      <OneTab updateUser={updateUser} updateLoggedIn={updateLoggedIn} index={1} currentTab={value} />
-      <OneTab updateUser={updateUser} updateLoggedIn={updateLoggedIn} index={2} currentTab={value} />
+
+      {tabs.map((item, i) => {
+          return <OneTab updateUser={updateUser} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user}/>
+      })}
     </>
   );
 }
