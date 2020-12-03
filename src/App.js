@@ -42,12 +42,13 @@ export default function App() {
   const handleNewFile = () => {
     if (filename === ""){
       const temp = uuidv4().substr(0,5)
-      setTabs((prestate) => [...prestate, `File ${temp}`]);
       localStorage.setItem("tabs", `${tabs},File ${temp}`)
+      setTabs((prestate) => [...prestate, `File ${temp}`]);
+
       return;
     }
-    setTabs((prestate) => [...prestate, filename]);
     localStorage.setItem("tabs", `${tabs},${filename}`)
+    setTabs((prestate) => [...prestate, filename]);
   }
 
   const handleFilename = (e) => {
@@ -55,17 +56,7 @@ export default function App() {
   }
 
   const handleKeyPress = (e) => {
-     if (e.key === 'Enter') {
-      if (filename === '') {
-        const temp = uuidv4().substr(0,5)
-        setTabs((prestate) => [...prestate, `File ${temp}`]);
-        localStorage.setItem("tabs", `${tabs},File ${temp}`)
-        return;
-      }
-      setTabs((prestate) => [...prestate, filename]);
-      localStorage.setItem("tabs", `${tabs},${filename}`)
-    }
-     setFileName(e.target.value);
+     e.preventDefault()
   }
 
   const useStyles = makeStyles((theme) => ({

@@ -67,7 +67,6 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
     });
 
      Socket.on('fixed', ({ linter, output, file_contents, tab }) => {
-       console.log(`code${tab}`)
       localStorage.setItem(`code${tab}`, file_contents);
       localStorage.setItem(`errors${tab}`, output)
       setLoading(false);
@@ -84,8 +83,8 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
   }, []);
 
   const handleChange = (newValue) => {
-    setCode(newValue);
     localStorage.setItem(`code${index}`, newValue);
+    setCode(newValue);
   };
 
   const handleClick = () => {
@@ -111,6 +110,7 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
     setLinter(value);
     localStorage.setItem(`linter${index}`, value);
     setPromptError('');
+    setStyleguide('')
   };
 
   const handleSelectedRepo = ({ value }) => {
@@ -189,10 +189,10 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
           : "div-error"}>
         <p className="error">{promptError}</p>
       </div>
-
       <Editor
         handleChange={handleChange}
-        code={code}
+        code={ currentTab === index ?
+            localStorage.getItem(`code${index}`) && parse(localStorage.getItem(`code${index}`)) || '' : ''}
       />
       <button type="submit" className="lintbutton" onClick={handleClick}>Lint!</button>
       <button type="submit" className="lintbutton" onClick={handleFix}>Fix!</button>

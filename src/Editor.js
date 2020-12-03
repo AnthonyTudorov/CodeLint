@@ -18,7 +18,6 @@ export default function Editor({ handleChange, code }) {
       setOptions={{
         enableBasicAutocompletion: true,
         enableLiveAutocompletion: true,
-        enableSnippets: true,
       }}
       name="ace-editor"
     />
