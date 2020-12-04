@@ -20,13 +20,29 @@ export default function Top({
           placeholder="Select a linter"
           options={['pylint', 'eslint']}
         />
-        <Dropmenu
-          handleDropdown={handleStyleguide}
-          value={styleguide}
-          className="dropdown"
-          placeholder="Select a styling guide"
-          options={['airbnb', 'standard', 'google']}
-        />
+
+         {linter === 'eslint'
+          ? (
+            <Dropmenu
+                handleDropdown={handleStyleguide}
+                value={styleguide}
+                className="dropdown"
+                placeholder="Select a styling guide"
+                options={['airbnb', 'standard', 'google']}
+            />
+          ) : ''}
+
+          {linter === 'pylint'
+          ? (
+            <Dropmenu
+                handleDropdown={handleStyleguide}
+                value={styleguide}
+                className="dropdown"
+                placeholder="Select a styling guide"
+                options={['pep8']}
+            />
+          ) : ''}
+
         {repos.length !== 0
           ? (
             <Dropmenu

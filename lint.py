@@ -37,7 +37,6 @@ def lint_code(file, data, fix=False):
     elif linter == 'pylint':
         return pylint(linter, filename, fix)
 
-
 def eslint(linter, filename, styleguide, fix=False):
     if fix:
         result = subprocess.run(
@@ -76,10 +75,12 @@ def pylint(linter, filename, fix=False):
                             '', result)
         result = re.sub(r'(<tr>(?s).+?<\/tr>)(?s).+?<td>1<\/td>(?s).+?Module name.+?<\/tr>',
                 r'\g<1> ', result)
+        result = result.replace("padding: 1em;", "")
     except Exception as e:
         print(e)
 
     filepath = os.path.join(here, SUBDIR, filename)
     file = open(filepath, "r")
     file_contents = file.read()
+
     return {'linter': linter, 'output': result, 'filename': filename, 'file_contents': file_contents}

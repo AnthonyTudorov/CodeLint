@@ -32,7 +32,7 @@ def log_user_info(user_access_token):
     db.session.commit()
     session.permanent = True
     session['user_id'] = user_id
-
+    print(session['user_id'])
 
 def auth_user(code, state):
     params = {
