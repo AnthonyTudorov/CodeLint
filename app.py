@@ -7,7 +7,7 @@ import flask_socketio
 from flask import request, session, redirect, url_for
 from markupsafe import escape
 from githubOauth import auth_user, logout_user, get_user_data, get_user_repos
-from githubOauth import get_user_repo_tree, get_user_file_contents
+from githubOauth import get_user_repo_tree, get_user_file_contents, commit_changes
 from settings import db, app
 from lint import lint_code, make_file
 
@@ -77,6 +77,10 @@ def on_get_file_contents(data):
     file_contents = get_user_file_contents(escape(session['user_id']), data['content_url'])
     file_contents["tab"] = data["index"]
     socketio.emit('file contents', file_contents, request.sid)
+    
+@socketio.on('commit changes')
+def on_commit_changes(data):
+    commit_changes(escape(session['user_id']), data['repo_url'], data['default_branch'], data['files'], data['commit_message'])
 
 @socketio.on('lint')
 def code(data):

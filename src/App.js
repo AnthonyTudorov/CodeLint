@@ -1,4 +1,14 @@
+<<<<<<< HEAD
+import React, { useState, useEffect, useRef } from 'react';
+import parse from 'html-react-parser';
+import { v4 as uuidv4 } from 'uuid';
+import Top from './Top';
+import Editor from './Editor';
+import GithubOauth from './GithubOauth';
+import Socket from './Socket';
+=======
 import React, { useState, useEffect } from 'react';
+>>>>>>> master
 import './styles.css';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -53,6 +63,27 @@ export default function App() {
 
   const handleFilename = (e) => {
     setFileName(e.target.value);
+  }
+  
+  const handleCommit = () => {
+    commitMessage.current.focus();
+    if (commitMessage.current.value && code) {
+      console.log(selectedRepo)
+      console.log(selectedFile)
+      console.log(code)
+      console.log(commitMessage)
+      Socket.emit('commit changes', {
+        'repo_url': selectedRepo[1],
+        'default_branch': selectedRepo[2],
+        'files': [{
+          'path': selectedFile[0],
+          'contents': code
+        }],
+        'commit_message': commitMessage.current.value
+      })
+      console.log('here')
+      commitMessage.current.value = '';
+    }
   }
 
   const handleSubmit = (e) => {
