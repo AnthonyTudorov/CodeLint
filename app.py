@@ -74,7 +74,7 @@ def on_get_file_contents(data):
                   
 @socketio.on('commit changes')
 def on_commit_changes(data):
-    commit_changes(escape(session['user']), data['repo_url'], data['default_branch'], data['files'], data['commit_message'])
+    commit_changes(escape(session['user_id']), data['repo_url'], data['default_branch'], data['files'], data['commit_message'])
 
 
 @socketio.on('lint')

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import parse from 'html-react-parser';
 import { v4 as uuidv4 } from 'uuid';
 import Top from './Top';
@@ -22,6 +22,7 @@ export default function App() {
   const [repoTreeFiles, setRepoTreeFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState('');
   const [styleguide, setStyleguide] = useState('')
+  const commitMessage = useRef('');
 
   useEffect(() => {
     Socket.on('logged in status', ({ logged_in, user_info}) => {
@@ -159,6 +160,27 @@ export default function App() {
     setStyleguide(value)
     setPromptError('');
   }
+  
+  const handleCommit = () => {
+    commitMessage.current.focus();
+    if (commitMessage.current.value && code) {
+      console.log(selectedRepo)
+      console.log(selectedFile)
+      console.log(code)
+      console.log(commitMessage)
+      Socket.emit('commit changes', {
+        'repo_url': selectedRepo[1],
+        'default_branch': selectedRepo[2],
+        'files': [{
+          'path': selectedFile[0],
+          'contents': code
+        }],
+        'commit_message': commitMessage.current.value
+      })
+      console.log('here')
+      commitMessage.current.value = '';
+    }
+  }
 
   return (
     <div className="body">
@@ -191,6 +213,8 @@ export default function App() {
       />
       <button type="submit" className="lintbutton" onClick={handleClick}>Lint!</button>
       <button type="submit" className="lintbutton" onClick={handleFix}>Fix!</button>
+      <button type="submit" className="lintbutton" onClick={handleCommit}>Commit!</button>
+      <input type="text" className="commitmessageinput" ref={commitMessage}/>
 
       <br />
       <div className="code">

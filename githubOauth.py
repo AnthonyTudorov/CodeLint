@@ -3,6 +3,7 @@
 import os
 import base64
 import requests
+from json import dumps
 from secrets import token_hex
 from dotenv import load_dotenv
 from flask import request, session
@@ -107,9 +108,9 @@ def get_user_repo_tree(user_id, repo_url, default_branch):
                         headers=headers)
                         
     #test stuff
-    files = [{'path': 'README.md', 'content': 'hello there'}]
-    commit_message = 'ayy'
-    commit_changes(user_id, repo_url, default_branch, files, commit_message)
+    #files = [{'path': 'README.md', 'content': 'change me'}, {'path': 'App.js', 'content': 'there it goes'}]
+    #commit_message = 'ayy3'
+    #commit_changes(user_id, repo_url, default_branch, files, commit_message)
     
     
                         
@@ -148,8 +149,8 @@ def create_blob(user_id, repo_url, content):
         'Accept': 'application/vnd.github.v3+json'
     }
     blob_url = repo_url + '/git/blobs'
-    data = {'content': content}
-    blob = requests.post(blob_url, headers=headers, content=content)
+    data = dumps({'content': content})
+    blob = requests.post(blob_url, headers=headers, data=data)
     if blob.status_code == 403:
         return {'blob_success': False, 'error': 'bad github token'}
         
@@ -181,12 +182,13 @@ def create_new_tree(user_id, repo_url, default_branch, files):
                 tree_update.append(obj)
                 
     new_tree_url = repo_url + '/git/trees'
-    data = {'tree': tree_update, 'base_tree': tree['sha']}
-    new_tree = request.post(new_tree_url, headers=headers, data=data)
+    data = dumps({'tree': tree_update, 'base_tree': tree['sha']})
+    new_tree = requests.post(new_tree_url, headers=headers, data=data)
     if new_tree.status_code == 403:
         return {'new_tree_success': False, 'error': 'bad github token'}
         
-    return (new_tree['sha'], last_commit['sha'])
+    new_tree = new_tree.json()
+    return (new_tree['sha'], repo['sha'])
 
 def update_branch_reference(user_id, repo_url, default_branch, commit_sha):
     user_access_token = models.Users.query.filter_by(
@@ -195,8 +197,8 @@ def update_branch_reference(user_id, repo_url, default_branch, commit_sha):
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
     }
-    ref_update_url = repo_url + '/git/refs/' + default_branch
-    data = {'sha': commit_sha}
+    ref_update_url = repo_url + '/git/refs/heads/' + default_branch
+    data = dumps({'sha': commit_sha})
     ref = requests.patch(ref_update_url, headers=headers, data=data)
     if ref.status_code == 403:
         return {'commit_success': False, 'error': 'bad github token'}
@@ -209,9 +211,9 @@ def commit_changes(user_id, repo_url, default_branch, files, commit_message):
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
     }
-    commit_url = repo_url + 'git/commits'
-    data = {'message': commit_message, 'tree': new_tree_sha, 'parent': [old_commit_sha]}
-    commit = request.post(commit_url, headers=headers, data=data)
+    commit_url = repo_url + '/git/commits'
+    data = dumps({'message': commit_message, 'tree': new_tree_sha, 'parents': [old_commit_sha]})
+    commit = requests.post(commit_url, headers=headers, data=data)
     if commit.status_code == 403:
         return {'commit_success': False, 'error': 'bad github token'}
     commit = commit.json()
