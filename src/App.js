@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef } from 'react';
-import parse from 'html-react-parser';
-import { v4 as uuidv4 } from 'uuid';
-import Top from './Top';
-import Editor from './Editor';
-import GithubOauth from './GithubOauth';
-import Socket from './Socket';
-=======
 import React, { useState, useEffect } from 'react';
->>>>>>> master
 import './styles.css';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
