@@ -33,6 +33,7 @@ export default function App() {
 
   const updateUser = (usr) => {
     setUser(usr);
+    localStorage.setItem('username', usr)
   };
 
   const updateLoggedIn = (status) => {
@@ -44,7 +45,6 @@ export default function App() {
       const temp = uuidv4().substr(0,5)
       localStorage.setItem("tabs", `${tabs},File ${temp}`)
       setTabs((prestate) => [...prestate, `File ${temp}`]);
-
       return;
     }
     localStorage.setItem("tabs", `${tabs},${filename}`)
@@ -55,8 +55,9 @@ export default function App() {
     setFileName(e.target.value);
   }
 
-  const handleKeyPress = (e) => {
+  const handleSubmit = (e) => {
      e.preventDefault()
+
   }
 
   const useStyles = makeStyles((theme) => ({
@@ -80,7 +81,7 @@ export default function App() {
           {tabs.map((item) => {
             return <Tab label={item} />
           })}
-          <form className={classes.root} type="submit" onKeyPress={handleKeyPress} noValidate autoComplete="off">
+          <form className={classes.root} type="submit" onSubmit={handleSubmit} noValidate autoComplete="off">
             <TextField className={classes.input} value={filename} id="outlined-basic" label="filename"
                        variant="filled" onChange={handleFilename} />
           </form>

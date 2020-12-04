@@ -37,7 +37,6 @@ def lint_code(file, data, fix=False):
     elif linter == 'pylint':
         return pylint(linter, filename, fix)
 
-
 def eslint(linter, filename, styleguide, fix=False):
     if fix:
         result = subprocess.run(

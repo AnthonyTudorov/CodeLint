@@ -41,6 +41,7 @@ def on_disconnect():
 
 @socketio.on('is logged in')
 def on_is_logged_in():
+    print('is logged in')
     if 'user_id' in session:
         user_id = escape(session.get('user_id'))
         if models.Users.query.filter_by(user_id=user_id).first() is not None:
@@ -58,20 +59,24 @@ def on_store_state(data):
 
 
 @socketio.on('get repos')
-def on_get_repos():
-    socketio.emit('repos', get_user_repos(escape(session['user_id'])), request.sid)
+def on_get_repos(data):
+    user_repos = get_user_repos(escape(session['user_id']))
+    user_repos["tab"] = data["index"]
+    socketio.emit('repos', user_repos, request.sid)
 
 
 @socketio.on('get repo tree')
 def on_get_repo_tree(data):
-    socketio.emit('repo tree', get_user_repo_tree(escape(session['user_id']),
-                                                  data['repo_url'], data['default_branch']), request.sid)
+    repo_tree = get_user_repo_tree(escape(session['user_id']),
+                data['repo_url'], data['default_branch'])
+    repo_tree["tab"] = data["index"]
+    socketio.emit('repo tree', repo_tree, request.sid)
 
 @socketio.on('get file contents')
 def on_get_file_contents(data):
-    socketio.emit('file contents',
-                  get_user_file_contents(escape(session['user_id']), data['content_url']), request.sid)
-
+    file_contents = get_user_file_contents(escape(session['user_id']), data['content_url'])
+    file_contents["tab"] = data["index"]
+    socketio.emit('file contents', file_contents, request.sid)
 
 @socketio.on('lint')
 def code(data):
