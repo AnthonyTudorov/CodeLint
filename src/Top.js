@@ -7,16 +7,16 @@ import loadingGif from "./loading.gif";
 
 export default function Top({
   handleLinter, handleSelectedRepo, linter, repos, handleRepoTree, repoTreeFiles,
-  selectedRepo, selectedFile, handleStyleguide, styleguide, loading
+  selectedRepo, selectedFile, handleStyleguide, styleguide, loading, changeFontSize, fontSize
 }) {
   return (
     <>
       <div className="top">
-        <h2>{loading ? <img height={25} width={25} src={loadingGif} alt="loading"/> : 'Codelint'}</h2>
+        {loading && <img height={25} width={25} src={loadingGif} alt="loading"/>}
         <Dropmenu
           handleDropdown={handleLinter}
           value={linter}
-          className="dropdown"
+          className="dropdownMain"
           placeholder="Select a linter"
           options={['pylint', 'eslint']}
         />
@@ -26,7 +26,7 @@ export default function Top({
             <Dropmenu
                 handleDropdown={handleStyleguide}
                 value={styleguide}
-                className="dropdown"
+                className="dropdownMain"
                 placeholder="Select a styling guide"
                 options={['airbnb', 'standard', 'google']}
             />
@@ -37,7 +37,7 @@ export default function Top({
             <Dropmenu
                 handleDropdown={handleStyleguide}
                 value={styleguide}
-                className="dropdown"
+                className="dropdownMain"
                 placeholder="Select a styling guide"
                 options={['pep8']}
             />
@@ -48,7 +48,7 @@ export default function Top({
             <Dropmenu
               handleDropdown={handleSelectedRepo}
               value={selectedRepo}
-              className="dropdown"
+              className="dropdownMain"
               placeholder="Select a repo after GitHub Auth"
               options={repos}
             />

@@ -3,9 +3,10 @@
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
-    font-family: proxima-nova
+    font-family: proxima-nova;
+    margin-top: 1.5em
 }
-.dropdown{
+.dropdownMain{
     width: 300px;
 }
 .files{
