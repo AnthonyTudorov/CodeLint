@@ -6,8 +6,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import GithubOauth from './GithubOauth';
+import GithubLogout from './GithubLogout';
 
-export default function Navbar({user, isLoggedIn}) {
+export default function Navbar({user, isLoggedIn, handleLogout}) {
+  
     const useStyles = makeStyles((theme) => ({
     root: {
       flexGrow: 1,
@@ -33,7 +35,11 @@ export default function Navbar({user, isLoggedIn}) {
             <Typography variant="h6" className={classes.title}>
               Codelint
             </Typography>
-            <Button color="inherit"><GithubOauth /></Button>
+            <div className="github">
+              <div className="user">{user}</div>
+              {!isLoggedIn && <GithubOauth />}
+              {isLoggedIn && <GithubLogout handleLogout={handleLogout}/>}
+            </div>
           </Toolbar>
         </AppBar>
       </div>
@@ -43,4 +49,5 @@ export default function Navbar({user, isLoggedIn}) {
 {/* <div className="github"> */}
 {/*  <div className="user">{user}</div> */}
 {/*  {!isLoggedIn && <GithubOauth />} */}
+{/*  {isLoggedIn && <GithubLogout handleLogout={handleLogout}/>} */}
 {/* </div> */}

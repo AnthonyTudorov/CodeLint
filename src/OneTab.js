@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import parse from 'html-react-parser';
 import { v4 as uuidv4 } from 'uuid';
 import Top from './Top';
@@ -25,6 +25,7 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
   const [currentTabErrors, setCurrentTabErrors] = useState(localStorage.getItem(`errors${index}`) &&
                                        parse(localStorage.getItem(`errors${index}`)) || '')
   const [username, setUsername] = useState(localStorage.getItem(`username`) || '')
+  const commitMessage = useRef('')
 
   useEffect(() => {
     Socket.on('logged in status', ({ logged_in, user_info}) => {
@@ -197,6 +198,28 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
     setStyleguide(value)
     setPromptError('');
   }
+  
+  const handleCommit = () => {
+    commitMessage.current.focus();
+    if (commitMessage.current.value && code) {
+      let found = false;
+      allRepoInfo.forEach(([repo_name, url, default_branch]) => {
+        if (selectedRepo === repo_name && !found) {
+          Socket.emit('commit changes', {
+            'repo_url': url,
+            'default_branch': default_branch,
+            'files': [{
+              'path': selectedFile,
+              'content': code
+            }],
+            'commit_message': commitMessage.current.value
+          })
+          commitMessage.current.value = '';
+          found = true
+        }
+      });
+    }
+  }
 
   const element = () => {
     return (
@@ -225,6 +248,8 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
       />
       <button type="submit" className="lintbutton" onClick={handleClick}>Lint!</button>
       <button type="submit" className="lintbutton" onClick={handleFix}>Fix!</button>
+      <button type="submit" className="lintbutton" onClick={handleCommit}>Commit!</button>
+      <input type="text" ref={commitMessage} />
 
       <br />
           { currentTab === index ? <div className="code">

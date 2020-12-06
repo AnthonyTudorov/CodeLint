@@ -41,7 +41,6 @@ def on_disconnect():
 
 @socketio.on('is logged in')
 def on_is_logged_in():
-    print('is logged in')
     if 'user_id' in session:
         user_id = escape(session.get('user_id'))
         if models.Users.query.filter_by(user_id=user_id).first() is not None:
@@ -52,6 +51,7 @@ def on_is_logged_in():
 @socketio.on('logout')
 def on_logout():
     logout_user(escape(session['user_id']))
+    socketio.emit('logout', request.sid)
 
 @socketio.on('store state')
 def on_store_state(data):
