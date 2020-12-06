@@ -29,7 +29,7 @@ function Navbar() {
       <nav className='navbar'>
         <div className='navbar-container'>
           <Link to='/' className='navbar-logo' onClick={closeMobileMenu}>
-            CodeLint
+            Codelint
             <i class='fab fa-typo3' />
           </Link>
           <div className='menu-icon' onClick={handleClick}>
@@ -47,7 +47,7 @@ function Navbar() {
                 className='nav-links'
                 onClick={closeMobileMenu}
               >
-                Linter
+                About Us
               </Link>
             </li>
             <li className='nav-item'>
@@ -56,21 +56,11 @@ function Navbar() {
                 className='nav-links'
                 onClick={closeMobileMenu}
               >
-                About Us
+                Contact Us
               </Link>
             </li>
 
-            <li>
-              <Link
-                to='/sign-up'
-                className='nav-links-mobile'
-                onClick={closeMobileMenu}
-              >
-                Sign Up
-              </Link>
-            </li>
           </ul>
-          {button && <Button buttonStyle='btn--outline'>SIGN UP</Button>}
         </div>
       </nav>
     </>

@@ -1,0 +1,45 @@
+@font-face {
+  font-family: 'proxima-nova';
+  src: url('/static/proximaNova.ttf');
+}
+
+.App {
+    text-align: left;
+    height: 100%;
+}
+
+html, body {
+    height: 98%;
+    font-family: proxima-nova;
+    margin: 0;
+    padding: 0;
+}
+
+.div-error {
+    width: 70%;
+    margin: 0 auto;
+    text-align: center;
+    background-color: #FFD2D2;
+    border-radius: 5px;
+}
+
+.github {
+    text-align: right;
+    background-color: #000000;
+    font-size: 5px;
+    display: flex;
+    flex: auto;
+    justify-content: flex-end;
+    align-items: center;
+}
+.lintbutton {
+    padding: 10px 24px;
+    right: 1px;
+    margin-bottom: 1em;
+}
+
+.user {
+    color: white;
+    margin-right: 2em;
+    font-size: 5em;
+}

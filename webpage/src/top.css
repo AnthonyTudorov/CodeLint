@@ -1,0 +1,13 @@
+.top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    font-family: proxima-nova
+}
+.dropdown{
+    width: 300px;
+}
+.files{
+    display: flex;
+}
