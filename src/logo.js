@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const Logo = (props) => (
   <svg
@@ -11,7 +11,7 @@ const Logo = (props) => (
     <defs />
     <style>
       {
-        ".companyName {fill:#EBE7D9;fill-opacity:1;}.icon3 {fill:#F55139;fill-opacity:1;}"
+        '.companyName {fill:#EBE7D9;fill-opacity:1;}.icon3 {fill:#F55139;fill-opacity:1;}'
       }
     </style>
     <g opacity={1} transform="rotate(0 0 0)">

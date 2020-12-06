@@ -3,16 +3,16 @@ import React from 'react';
 import 'react-dropdown/style.css';
 import './top.css';
 import Dropmenu from './Dropmenu';
-import loadingGif from "./loading.gif";
+import loadingGif from './loading.gif';
 
 export default function Top({
   handleLinter, handleSelectedRepo, linter, repos, handleRepoTree, repoTreeFiles,
-  selectedRepo, selectedFile, handleStyleguide, styleguide, loading, changeFontSize, fontSize
+  selectedRepo, selectedFile, handleStyleguide, styleguide, loading, changeFontSize, fontSize,
 }) {
   return (
     <>
       <div className="top">
-        {loading && <img height={25} width={25} src={loadingGif} alt="loading"/>}
+        {loading && <img height={25} width={25} src={loadingGif} alt="loading" />}
         <Dropmenu
           handleDropdown={handleLinter}
           value={linter}
@@ -21,25 +21,25 @@ export default function Top({
           options={['pylint', 'eslint']}
         />
 
-         {linter === 'eslint'
+        {linter === 'eslint'
           ? (
             <Dropmenu
-                handleDropdown={handleStyleguide}
-                value={styleguide}
-                className="dropdownMain"
-                placeholder="Select a styling guide"
-                options={['airbnb', 'standard', 'google']}
+              handleDropdown={handleStyleguide}
+              value={styleguide}
+              className="dropdownMain"
+              placeholder="Select a styling guide"
+              options={['airbnb', 'standard', 'google']}
             />
           ) : ''}
 
-          {linter === 'pylint'
+        {linter === 'pylint'
           ? (
             <Dropmenu
-                handleDropdown={handleStyleguide}
-                value={styleguide}
-                className="dropdownMain"
-                placeholder="Select a styling guide"
-                options={['pep8']}
+              handleDropdown={handleStyleguide}
+              value={styleguide}
+              className="dropdownMain"
+              placeholder="Select a styling guide"
+              options={['pep8']}
             />
           ) : ''}
 

@@ -6,12 +6,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import GitHubIcon from '@material-ui/icons/GitHub';
 
 export default function GithubOauth() {
-    const useStyles = makeStyles((theme) => ({
+  const useStyles = makeStyles((theme) => ({
     button: {
-        margin: theme.spacing(1),
-        backgroundColor: "primary"
+      margin: theme.spacing(1),
+      backgroundColor: 'primary',
     },
-    }));
+  }));
   const classes = useStyles();
   function handleLogin() {
     const state = Math.random().toString();
@@ -23,14 +23,14 @@ export default function GithubOauth() {
   }
 
   return (
-      <Button
-        variant="contained"
-        className={classes.button}
-        startIcon={<GitHubIcon />}
-        onClick={handleLogin}
-         size="medium"
-      >
-        Login with GitHub
-      </Button>
-      );
+    <Button
+      variant="contained"
+      className={classes.button}
+      startIcon={<GitHubIcon />}
+      onClick={handleLogin}
+      size="medium"
+    >
+      Login with GitHub
+    </Button>
+  );
 }

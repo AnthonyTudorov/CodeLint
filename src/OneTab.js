@@ -6,90 +6,91 @@ import Editor from './Editor';
 import Socket from './Socket';
 import './styles.css';
 
-export default function OneTab({index, currentTab, updateUser, updateLoggedIn, user, theme, fontSize, changeFontSize}) {
-  console.log(`from repos: ${user}`)
+export default function OneTab({
+  index, currentTab, updateUser, updateLoggedIn, user, theme, fontSize, changeFontSize,
+}) {
+  console.log(`from repos: ${user}`);
   const [code, setCode] = useState(localStorage.getItem(`code${index}` || ''));
   const [linter, setLinter] = useState(localStorage.getItem(`linter${index}`) || '');
   const [promptError, setPromptError] = useState('');
   const [loading, setLoading] = useState(false);
   const [repos, setRepos] = useState([]);
-  const [allRepoInfo, setAllRepoInfo] = useState(localStorage.getItem(`allRepoInfo`) &&
-                                       JSON.parse(localStorage.getItem(`allRepoInfo`)) || []);
+  const [allRepoInfo, setAllRepoInfo] = useState(localStorage.getItem('allRepoInfo')
+                                       && JSON.parse(localStorage.getItem('allRepoInfo')) || []);
   const [selectedRepo, setSelectedRepo] = useState(localStorage.getItem(`selectedRepo${index}`) || '');
-  const [repoTree, setRepoTree] = useState(localStorage.getItem(`repo_tree`) &&
-                                       JSON.parse(localStorage.getItem(`repo_tree`)) || []);
-  const [repoTreeFiles, setRepoTreeFiles] = useState(localStorage.getItem(`repo_tree_files`) &&
-                                       JSON.parse(localStorage.getItem(`repo_tree_files`)) || []);
+  const [repoTree, setRepoTree] = useState(localStorage.getItem('repo_tree')
+                                       && JSON.parse(localStorage.getItem('repo_tree')) || []);
+  const [repoTreeFiles, setRepoTreeFiles] = useState(localStorage.getItem('repo_tree_files')
+                                       && JSON.parse(localStorage.getItem('repo_tree_files')) || []);
   const [selectedFile, setSelectedFile] = useState(localStorage.getItem(`selectedFile${index}`) || '');
-  const [styleguide, setStyleguide] = useState(localStorage.getItem(`styleguide${index}`) || '')
-  const [currentTabErrors, setCurrentTabErrors] = useState(localStorage.getItem(`errors${index}`) &&
-                                       parse(localStorage.getItem(`errors${index}`)) || '')
-  const [username, setUsername] = useState(localStorage.getItem(`username`) || '')
-  const commitMessage = useRef('')
+  const [styleguide, setStyleguide] = useState(localStorage.getItem(`styleguide${index}`) || '');
+  const [currentTabErrors, setCurrentTabErrors] = useState(localStorage.getItem(`errors${index}`)
+                                       && parse(localStorage.getItem(`errors${index}`)) || '');
+  const [username, setUsername] = useState(localStorage.getItem('username') || '');
+  const commitMessage = useRef('');
 
   useEffect(() => {
-    Socket.on('logged in status', ({ logged_in, user_info}) => {
+    Socket.on('logged in status', ({ logged_in, user_info }) => {
       if (logged_in === true) {
-        updateUser(user_info['login'])
-        setUsername(username => user_info['login']);
-        updateLoggedIn(true)
-        Socket.emit('get repos', {index});
-      }
-      else {
-        updateLoggedIn(false)
+        updateUser(user_info.login);
+        setUsername((username) => user_info.login);
+        updateLoggedIn(true);
+        Socket.emit('get repos', { index });
+      } else {
+        updateLoggedIn(false);
       }
     });
 
     Socket.on('user data', ({ login }) => {
-      setUsername(username => login);
-      updateUser(login)
-      updateLoggedIn(true)
-      Socket.emit('get repos', {index});
+      setUsername((username) => login);
+      updateUser(login);
+      updateLoggedIn(true);
+      Socket.emit('get repos', { index });
     });
 
     Socket.on('repos', ({ repos }) => {
-      const usr = localStorage.getItem(`username`)
-      const arr = []
+      const usr = localStorage.getItem('username');
+      const arr = [];
       repos.forEach(([elem, link]) => {
         if (link.includes(usr)) {
-          arr.push(elem)
+          arr.push(elem);
         }
-      })
+      });
       setRepos(arr);
       setAllRepoInfo(repos);
-      localStorage.setItem(`allRepoInfo`, JSON.stringify(repos));
+      localStorage.setItem('allRepoInfo', JSON.stringify(repos));
     });
 
     Socket.on('repo tree', (data) => {
-      localStorage.setItem("repo_tree", JSON.stringify(data))
+      localStorage.setItem('repo_tree', JSON.stringify(data));
       setRepoTree(data);
       const arr = [];
       data.tree.forEach(({ path, type }) => {
         if (type === 'blob') arr.push(path);
       });
       setRepoTreeFiles(arr);
-      localStorage.setItem("repo_tree_files", JSON.stringify(arr))
+      localStorage.setItem('repo_tree_files', JSON.stringify(arr));
     });
 
-    Socket.on('file contents', ({contents, tab}) => {
+    Socket.on('file contents', ({ contents, tab }) => {
       localStorage.setItem(`code${tab}`, contents);
-      if (index === tab)
-        setCode(contents);
+      if (index === tab) { setCode(contents); }
     });
 
-     Socket.on('output', ({ linter, output, tab }) => {
-      localStorage.setItem(`errors${tab}`, output)
+    Socket.on('output', ({ linter, output, tab }) => {
+      localStorage.setItem(`errors${tab}`, output);
       setLoading(false);
-      if (index === tab)
-        setCurrentTabErrors(parse(output));
+      if (index === tab) { setCurrentTabErrors(parse(output)); }
     });
 
-     Socket.on('fixed', ({ linter, output, file_contents, tab }) => {
+    Socket.on('fixed', ({
+      linter, output, file_contents, tab,
+    }) => {
       localStorage.setItem(`code${tab}`, file_contents);
-      localStorage.setItem(`errors${tab}`, output)
+      localStorage.setItem(`errors${tab}`, output);
       setLoading(false);
-      if (index === tab){
-        setCode(file_contents)
+      if (index === tab) {
+        setCode(file_contents);
         setCurrentTabErrors(parse(output));
       }
     });
@@ -122,7 +123,7 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
       linter,
       uuid: uuidv4(),
       styleguide,
-      index
+      index,
     });
   };
 
@@ -130,7 +131,7 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
     setLinter(value);
     localStorage.setItem(`linter${index}`, value);
     setPromptError('');
-    setStyleguide('')
+    setStyleguide('');
   };
 
   const handleSelectedRepo = ({ value }) => {
@@ -142,10 +143,10 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
         if (url.includes(username)) {
           Socket.emit('get repo tree', {
             repo_url: url,
-            default_branch: default_branch,
-            index
+            default_branch,
+            index,
           });
-          found = true
+          found = true;
         }
       }
     });
@@ -158,9 +159,9 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
       if (path === value) {
         Socket.emit('get file contents', {
           content_url: url,
-          index
+          index,
         });
-        if (value.includes('.py')){
+        if (value.includes('.py')) {
           setLinter('pylint');
           localStorage.setItem(`linter${index}`, 'pylint');
         }
@@ -173,11 +174,11 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
   };
 
   const handleFix = () => {
-     if (linter === '') {
+    if (linter === '') {
       setPromptError('Please select a linter!');
       return;
-     }
-     if (styleguide === '') {
+    }
+    if (styleguide === '') {
       setPromptError('Please select a style guide!');
       return;
     }
@@ -188,16 +189,16 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
       uuid: uuidv4(),
       fix: true,
       styleguide,
-      index
+      index,
     });
-  }
+  };
 
   const handleStyleguide = ({ value }) => {
     localStorage.setItem(`styleguide${index}`, value);
-    setStyleguide(value)
+    setStyleguide(value);
     setPromptError('');
-  }
-  
+  };
+
   const handleCommit = () => {
     commitMessage.current.focus();
     if (commitMessage.current.value && code) {
@@ -205,24 +206,23 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
       allRepoInfo.forEach(([repo_name, url, default_branch]) => {
         if (selectedRepo === repo_name && !found) {
           Socket.emit('commit changes', {
-            'repo_url': url,
-            'default_branch': default_branch,
-            'files': [{
-              'path': selectedFile,
-              'content': code
+            repo_url: url,
+            default_branch,
+            files: [{
+              path: selectedFile,
+              content: code,
             }],
-            'commit_message': commitMessage.current.value
-          })
+            commit_message: commitMessage.current.value,
+          });
           commitMessage.current.value = '';
-          found = true
+          found = true;
         }
       });
     }
-  }
+  };
 
-  const element = () => {
-    return (
-        <div className="body">
+  const element = () => (
+    <div className="body">
       <Top
         handleSelectedRepo={handleSelectedRepo}
         selectedRepo={selectedRepo}
@@ -239,8 +239,9 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
         fontSize={fontSize}
       />
 
-      <div className={loading ? ""
-          : "div-error"}>
+      <div className={loading ? ''
+        : 'div-error'}
+      >
         <p className="error">{promptError}</p>
       </div>
       <Editor
@@ -248,6 +249,7 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
         code={code}
         theme={theme}
         fontSize={fontSize}
+        linter={linter}
       />
       <button type="submit" className="lintbutton" onClick={handleClick}>Lint!</button>
       <button type="submit" className="lintbutton" onClick={handleFix}>Fix!</button>
@@ -255,16 +257,17 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
       <input type="text" ref={commitMessage} />
 
       <br />
-          { currentTab === index ? <div className="code">
-        {currentTabErrors}
-      </div> : null}
+      { currentTab === index ? (
+        <div className="code">
+          {currentTabErrors}
+        </div>
+      ) : null}
     </div>
-    );
-  }
+  );
 
   return (
-      <>
-        {currentTab === index ? element() : null}
-      </>
+    <>
+      {currentTab === index ? element() : null}
+    </>
   );
 }

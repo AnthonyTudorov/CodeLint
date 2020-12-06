@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const CaretIcon = (props) => (
   <svg viewBox="0 0 512 512" {...props}>

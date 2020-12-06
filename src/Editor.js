@@ -3,6 +3,7 @@ import React from 'react';
 import AceEditor from 'react-ace';
 import './editor.css';
 import 'ace-builds/src-noconflict/mode-javascript';
+import 'ace-builds/src-noconflict/mode-python';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 import 'ace-builds/src-noconflict/theme-github';
 import 'ace-builds/src-noconflict/theme-monokai';
@@ -17,10 +18,12 @@ import 'ace-builds/src-noconflict/theme-terminal';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/webpack-resolver';
 
-export default function Editor({ handleChange, code, theme, fontSize }) {
+export default function Editor({
+  handleChange, code, theme, fontSize, linter,
+}) {
   return (
     <AceEditor
-      mode="javascript"
+      mode={linter && linter === 'eslint' && 'javascript' || 'python'}
       theme={theme}
       onChange={handleChange}
       value={code}
@@ -30,8 +33,8 @@ export default function Editor({ handleChange, code, theme, fontSize }) {
         enableLiveAutocompletion: true,
       }}
       name="ace-editor"
-      tabSize = {2}
-      fontSize = {parseInt(fontSize)}
+      tabSize={2}
+      fontSize={parseInt(fontSize)}
     />
   );
 }
