@@ -31,7 +31,7 @@ class mocked(unittest.TestCase):
             'state': 4321
         }
         
-        with patch('requests.post', mock_methods.mock_success_request_post), patch('requests.get', mock_methods.mock_success_request_get), patch('settings.db.session', mock_methods.mock_db_session), patch('models.Users', mock_methods.mock_users), patch('githubOauth.token_hex', mock_methods.mock_token_hex), patch('githubOauth.session.permenant', mock_methods.mock_session_permenant), patch('githubOauth.session', mock_methods.mock_session):
+        with patch('requests.post', mock_methods.mock_success_request_post), patch('requests.get', mock_methods.mock_success_request_get), patch('settings.db.session', mock_methods.mock_db_session), patch('models.Users', mock_methods.mock_users_bad_query), patch('githubOauth.token_hex', mock_methods.mock_token_hex), patch('githubOauth.session', mock_methods.mock_session):
             githubOauth.auth_user(**INPUT)
             
     def test_get_user_data(self):
@@ -51,7 +51,7 @@ class mocked(unittest.TestCase):
             'user_id': 1234
         }
         OUTPUT = mock_github_responses.repos_return
-        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_success_request_get):
+        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_success_request_get), patch('githubOauth.Fernet', mock_methods.mock_fernet):
             response = githubOauth.get_user_repos(**INPUT)
         self.assertDictEqual(response, OUTPUT)
         
@@ -60,7 +60,7 @@ class mocked(unittest.TestCase):
             'user_id': 1234
         }
         OUTPUT = {'repos': None, 'error': 'bad github token'}
-        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_failure_request_get):
+        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_failure_request_get), patch('githubOauth.Fernet', mock_methods.mock_fernet):
             response = githubOauth.get_user_repos(**INPUT)
         self.assertDictEqual(response, OUTPUT)
         
@@ -71,7 +71,7 @@ class mocked(unittest.TestCase):
             'default_branch': 'master'
         }
         OUTPUT = mock_github_responses.tree_return
-        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_success_request_get):
+        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_success_request_get), patch('githubOauth.Fernet', mock_methods.mock_fernet):
             response = githubOauth.get_user_repo_tree(**INPUT)
         self.assertDictEqual(response, OUTPUT)
         
@@ -82,7 +82,7 @@ class mocked(unittest.TestCase):
             'default_branch': 'master'
         }
         OUTPUT = {'tree': None, 'error': 'bad github token'}
-        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_failure_request_get):
+        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_failure_request_get), patch('githubOauth.Fernet', mock_methods.mock_fernet), patch('githubOauth.get_prev_commit', mock_methods.mock_get_prev_commit):
             response = githubOauth.get_user_repo_tree(**INPUT)
         self.assertDictEqual(response, OUTPUT)
 
@@ -92,7 +92,7 @@ class mocked(unittest.TestCase):
             'content_url': 'https://api.github.com/repos/rudra-desai/Codelint/git/blobs/a9150ca05f13ad4e0d79311b7ba9da09227553da'
         }
         OUTPUT = mock_github_responses.content_return
-        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_success_request_get):
+        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_success_request_get), patch('githubOauth.Fernet', mock_methods.mock_fernet):
             response = githubOauth.get_user_file_contents(**INPUT)
         self.assertDictEqual(response, OUTPUT)
         
@@ -102,9 +102,29 @@ class mocked(unittest.TestCase):
             'content_url': 'https://api.github.com/repos/rudra-desai/Codelint/git/blobs/a9150ca05f13ad4e0d79311b7ba9da09227553da'
         }
         OUTPUT = {'contents': None, 'error': 'bad github token'}
-        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_failure_request_get):
+        with patch('models.Users', mock_methods.mock_users), patch('requests.get', mock_methods.mock_failure_request_get), patch('githubOauth.Fernet', mock_methods.mock_fernet):
             response = githubOauth.get_user_file_contents(**INPUT)
         self.assertDictEqual(response, OUTPUT)
+        
+    def test_failure_get_user_file_contents(self):
+        INPUT = {
+            'user_id': 1234,
+        }
+        with patch('settings.db.session', mock_methods.mock_db_session), patch('models.Users', mock_methods.mock_users):
+            githubOauth.logout_user(**INPUT)
+        
+    def test_sucess_commit_changes(self):
+        INPUT = {
+            'user_id': 1234,
+            'repo_url': 'https://api.github.com/repos/rudra-desai/Codelint',
+            'default_branch': 'main',
+            'files': [{'path': 'src/App.js', 'content': 'test'}],
+            'commit_message': 'testing'
+        }
+        OUTPUT = None
+        with patch('models.Users', mock_methods.mock_users), patch('githubOauth.Fernet', mock_methods.mock_fernet), patch('githubOauth.get_prev_commit', mock_methods.mock_get_prev_commit), patch('requests.get', mock_methods.mock_success_request_get), patch('githubOauth.dumps', mock_methods.mock_dumps), patch('requests.post', mock_methods.mock_success_request_post), patch('requests.patch', mock_methods.mock_success_request_patch):
+            response = githubOauth.commit_changes(**INPUT)
+        self.assertEqual(response, OUTPUT)
         
     def test_models(self):
         INPUT = {
