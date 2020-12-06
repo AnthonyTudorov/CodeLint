@@ -3,6 +3,7 @@
 import os
 import base64
 import requests
+from cryptography.fernet import Fernet
 from json import dumps
 from secrets import token_hex
 from dotenv import load_dotenv
@@ -14,10 +15,11 @@ load_dotenv()
 github_id = os.getenv('GITHUB_CLIENT_ID')
 github_secret = os.getenv('GITHUB_CLIENT_SECRET')
 github_redirect_uri = os.getenv('GITHUB_REDIRECT_URI')
+access_token_key = os.getenv('ACCESS_TOKEN_KEY')
 
 
-def log_user_info(user_access_token):
-    headers = {'Authorization': 'token ' + user_access_token}
+def log_user_info(access_token):
+    headers = {'Authorization': 'token ' + access_token}
     user = requests.get('https://api.github.com/user', headers=headers).json()
     login = user['login']
     name = user['name']
@@ -26,13 +28,13 @@ def log_user_info(user_access_token):
     user_id = token_hex(16)
     while models.Users.query.filter_by(user_id=user_id).first() is not None:
         user_id = token_hex(16)
+    a = Fernet(access_token_key).encrypt(access_token.encode())
     model = models.Users(login, name, email, profile_image, user_id,
-                         user_access_token)
+                         a)
     db.session.add(model)
     db.session.commit()
     session.permanent = True
     session['user_id'] = user_id
-    print(session['user_id'])
 
 def auth_user(code, state):
     params = {
@@ -62,8 +64,8 @@ def get_user_data(user_id):
 
 
 def get_user_repos(user_id):
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
@@ -81,8 +83,8 @@ def get_user_repos(user_id):
     }
 
 def get_prev_commit(user_id, repo_url, default_branch):
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
@@ -95,8 +97,8 @@ def get_prev_commit(user_id, repo_url, default_branch):
     return repo
 
 def get_user_repo_tree(user_id, repo_url, default_branch):
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
@@ -122,8 +124,8 @@ def get_user_repo_tree(user_id, repo_url, default_branch):
 
 
 def get_user_file_contents(user_id, content_url):
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
@@ -142,8 +144,8 @@ def get_user_file_contents(user_id, content_url):
         }
 
 def create_blob(user_id, repo_url, content):
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
@@ -158,8 +160,8 @@ def create_blob(user_id, repo_url, content):
     return blob['sha']
     
 def create_new_tree(user_id, repo_url, default_branch, files):
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
@@ -191,8 +193,8 @@ def create_new_tree(user_id, repo_url, default_branch, files):
     return (new_tree['sha'], repo['sha'])
 
 def update_branch_reference(user_id, repo_url, default_branch, commit_sha):
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
@@ -205,8 +207,8 @@ def update_branch_reference(user_id, repo_url, default_branch, commit_sha):
     
 def commit_changes(user_id, repo_url, default_branch, files, commit_message):
     new_tree_sha, old_commit_sha = create_new_tree(user_id, repo_url, default_branch, files)
-    user_access_token = models.Users.query.filter_by(
-        user_id=user_id).first().access_token
+    user_access_token = Fernet(access_token_key).decrypt(models.Users.query.filter_by(
+        user_id=user_id).first().access_token).decode()
     headers = {
         'Authorization': 'token ' + user_access_token,
         'Accept': 'application/vnd.github.v3+json'
