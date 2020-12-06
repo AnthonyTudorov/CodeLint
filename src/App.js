@@ -25,6 +25,11 @@ export default function App() {
     if (oldTabs)
       setTabs(oldTabs.split(","))
   }, []);
+  
+  const handleLogout = () => {
+    Socket.emit('logout');
+    setIsLoggedIn(false);
+  }
 
   const handleChange = (e, val) => {
     if (e.constructor.name !== 'SyntheticEvent')
@@ -54,27 +59,6 @@ export default function App() {
   const handleFilename = (e) => {
     setFileName(e.target.value);
   }
-  
-  const handleCommit = () => {
-    commitMessage.current.focus();
-    if (commitMessage.current.value && code) {
-      console.log(selectedRepo)
-      console.log(selectedFile)
-      console.log(code)
-      console.log(commitMessage)
-      Socket.emit('commit changes', {
-        'repo_url': selectedRepo[1],
-        'default_branch': selectedRepo[2],
-        'files': [{
-          'path': selectedFile[0],
-          'contents': code
-        }],
-        'commit_message': commitMessage.current.value
-      })
-      console.log('here')
-      commitMessage.current.value = '';
-    }
-  }
 
   const handleSubmit = (e) => {
      e.preventDefault()
@@ -96,7 +80,7 @@ export default function App() {
   const classes = useStyles();
   return (
     <>
-      <Navbar user={user} isLoggedIn={isLoggedIn} />
+      <Navbar user={user} isLoggedIn={isLoggedIn} handleLogout={handleLogout}/>
       <AppBar position="static">
         <Tabs variant="scrollable" value={value} onChange={handleChange}>
           {tabs.map((item) => {

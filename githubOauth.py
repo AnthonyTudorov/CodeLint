@@ -108,14 +108,6 @@ def get_user_repo_tree(user_id, repo_url, default_branch):
     tree = requests.get(repo['commit']['tree']['url'],
                         params=params,
                         headers=headers)
-                        
-    #test stuff
-    #files = [{'path': 'README.md', 'content': 'change me'}, {'path': 'App.js', 'content': 'there it goes'}]
-    #commit_message = 'ayy3'
-    #commit_changes(user_id, repo_url, default_branch, files, commit_message)
-    
-    
-                        
     if tree.status_code == 403:
         return {'tree': None, 'error': 'bad github token'}
 
