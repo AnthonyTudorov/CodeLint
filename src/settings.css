@@ -65,6 +65,7 @@ a {
   align-items: center;
   justify-content: center;
   transition: filter 300ms;
+  outline:none;
 }
 
 .icon-button:hover {

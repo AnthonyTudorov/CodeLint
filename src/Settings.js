@@ -9,9 +9,13 @@ import Logo from './logo';
 import CaretIcon from './Caret';
 import GithubOauth from './GithubOauth';
 import GithubLogout from './GithubLogout';
+import Brightness7Icon from '@material-ui/icons/Brightness7';
+import Brightness3Icon from '@material-ui/icons/Brightness3';
+import TextFieldsIcon from '@material-ui/icons/TextFields';
+import TextFormatIcon from '@material-ui/icons/TextFormat';
 
 function Settings({
-  changeTheme, isLoggedIn, handleLogout, user,
+  changeTheme, isLoggedIn, handleLogout, user, handleFontSize
 }) {
   return (
     <>
@@ -19,6 +23,7 @@ function Settings({
         <NavItem icon={<CaretIcon />}>
           <DropdownMenu
             changeTheme={changeTheme}
+            handleFontSize={handleFontSize}
             user={user}
           />
         </NavItem>
@@ -34,7 +39,7 @@ function Navtop(props) {
       <div style={{ alignItems: 'center', width: '100%' }} className="navbar-nav">
         <ul>
           {props.children}
-          {/* {!props.isLoggedIn && <GithubOauth /> || props.children && <GithubLogout handleLogout={props.handleLogout}/>} */}
+           {/*{!props.isLoggedIn && <GithubOauth /> || props.children && <GithubLogout handleLogout={props.handleLogout}/>}*/}
         </ul>
       </div>
     </nav>
@@ -53,7 +58,7 @@ function NavItem(props) {
   );
 }
 
-function DropdownMenu({ changeTheme, user }) {
+function DropdownMenu({ changeTheme, user, handleFontSize }) {
   const [activeMenu, setActiveMenu] = useState('main');
   const [menuHeight, setMenuHeight] = useState(null);
   const dropdownRef = useRef(null);
@@ -69,9 +74,8 @@ function DropdownMenu({ changeTheme, user }) {
   function DropdownItem(props) {
     const handleChange = () => {
       if (props.goToMenu) { setActiveMenu(props.goToMenu); }
-      if (props.value) {
-        props.changeTheme(props.value);
-      }
+      if (props.value) { props.changeTheme(props.value); }
+      if (props.size) { props.changeFontSize(props.size) }
     };
     return (
       <a href="#" className="menu-item" onClick={handleChange}>
@@ -103,6 +107,12 @@ function DropdownMenu({ changeTheme, user }) {
           >
             Editor Settings
           </DropdownItem>
+          <DropdownItem
+            leftIcon={<TextFieldsIcon />}
+            goToMenu="font"
+          >
+            Editor Font Size
+          </DropdownItem>
 
         </div>
       </CSSTransition>
@@ -118,8 +128,8 @@ function DropdownMenu({ changeTheme, user }) {
           <DropdownItem goToMenu="main" leftIcon={<ArrowBackIosIcon />}>
             <h4>Go Back</h4>
           </DropdownItem>
-          <DropdownItem leftIcon={<CaretIcon />}>Light Mode</DropdownItem>
-          <DropdownItem leftIcon={<CaretIcon />}>Dark Mode</DropdownItem>
+          <DropdownItem leftIcon={<Brightness7Icon />}>Light Mode</DropdownItem>
+          <DropdownItem leftIcon={<Brightness3Icon />}>Dark Mode</DropdownItem>
         </div>
       </CSSTransition>
 
@@ -147,6 +157,28 @@ function DropdownMenu({ changeTheme, user }) {
           <DropdownItem changeTheme={changeTheme} value="terminal" leftIcon={<ArrowForwardIosIcon />}>Terminal</DropdownItem>
         </div>
       </CSSTransition>
+
+      <CSSTransition
+        in={activeMenu === 'font'}
+        timeout={500}
+        classNames="menu-secondary"
+        unmountOnExit
+        onEnter={calcHeight}
+      >
+        <div className="menu">
+          <DropdownItem goToMenu="main" leftIcon={<ArrowBackIosIcon />}>
+            <h4>Go Back</h4>
+          </DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size='12' leftIcon={<TextFormatIcon />}>12</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize}  size='14' leftIcon={<TextFormatIcon />}>14</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size='16' leftIcon={<TextFormatIcon />}>16</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size='18' leftIcon={<TextFormatIcon />}>18</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size='20' leftIcon={<TextFormatIcon />}>20</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size='22' leftIcon={<TextFormatIcon />}>22</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize}  size='24' leftIcon={<TextFormatIcon />}>24</DropdownItem>
+        </div>
+      </CSSTransition>
+
     </div>
   );
 }
