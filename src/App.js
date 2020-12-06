@@ -11,6 +11,7 @@ import Socket from './Socket';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { v4 as uuidv4 } from 'uuid';
+import Settings from "./Settings";
 
 export default function App() {
   const [value, setValue] = useState(0);
@@ -18,6 +19,8 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tabs, setTabs] = useState(["New File"]);
   const [filename, setFileName] = useState('')
+  const [theme, setTheme] = useState(localStorage.getItem(`editorTheme`) || 'solarized_light')
+  const [fontSize, setFontSize] = useState('14')
 
   useEffect(() => {
     Socket.emit('is logged in');
@@ -38,6 +41,10 @@ export default function App() {
 
   const updateLoggedIn = (status) => {
     setIsLoggedIn(status);
+  };
+
+  const handleFontSize = ({ value }) => {
+    setFontSize(value);
   };
 
   const handleNewFile = () => {
@@ -78,7 +85,11 @@ export default function App() {
 
   const handleSubmit = (e) => {
      e.preventDefault()
+  }
 
+  const handleTheme = (val) => {
+    localStorage.setItem('editorTheme', val)
+    setTheme(val)
   }
 
   const useStyles = makeStyles((theme) => ({
@@ -94,9 +105,11 @@ export default function App() {
     },
   }));
   const classes = useStyles();
+
+
   return (
     <>
-      <Navbar user={user} isLoggedIn={isLoggedIn} />
+      <Settings user={user} isLoggedIn={isLoggedIn} changeTheme={handleTheme}/>
       <AppBar position="static">
         <Tabs variant="scrollable" value={value} onChange={handleChange}>
           {tabs.map((item) => {
@@ -113,7 +126,7 @@ export default function App() {
       </AppBar>
 
       {tabs.map((item, i) => {
-          return <OneTab updateUser={updateUser} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user}/>
+          return <OneTab changeFontSize={handleFontSize} fontSize={fontSize} updateUser={updateUser} theme={theme} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user}/>
       })}
     </>
   );

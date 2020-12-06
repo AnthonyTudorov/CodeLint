@@ -6,7 +6,7 @@ import Editor from './Editor';
 import Socket from './Socket';
 import './styles.css';
 
-export default function OneTab({index, currentTab, updateUser, updateLoggedIn, user}) {
+export default function OneTab({index, currentTab, updateUser, updateLoggedIn, user, theme, fontSize, changeFontSize}) {
   console.log(`from repos: ${user}`)
   const [code, setCode] = useState(localStorage.getItem(`code${index}` || ''));
   const [linter, setLinter] = useState(localStorage.getItem(`linter${index}`) || '');
@@ -60,7 +60,6 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
     });
 
     Socket.on('repo tree', (data) => {
-      console.log(`${data}`)
       localStorage.setItem("repo_tree", JSON.stringify(data))
       setRepoTree(data);
       const arr = [];
@@ -213,6 +212,8 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
         handleStyleguide={handleStyleguide}
         styleguide={styleguide}
         loading={loading}
+        changeFontSize={changeFontSize}
+        fontSize={fontSize}
       />
 
       <div className={loading ? ""
@@ -222,6 +223,8 @@ export default function OneTab({index, currentTab, updateUser, updateLoggedIn, u
       <Editor
         handleChange={handleChange}
         code={code}
+        theme={theme}
+        fontSize={fontSize}
       />
       <button type="submit" className="lintbutton" onClick={handleClick}>Lint!</button>
       <button type="submit" className="lintbutton" onClick={handleFix}>Fix!</button>
