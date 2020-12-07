@@ -23,8 +23,6 @@ export default function App() {
 
   useEffect(() => {
     Socket.emit('is logged in');
-    const oldTabs = localStorage.getItem('tabs');
-    if (oldTabs) setTabs(oldTabs.split(','));
   }, []);
 
   const handleLogout = () => {

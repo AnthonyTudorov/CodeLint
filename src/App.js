@@ -14,13 +14,12 @@ import Settings from './Settings'
 
 export default function App() {
   const [value, setValue] = useState(0);
-  const [user, setUser] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(localStorage.getItem('username') || '');
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('username') && true || false);
   const [tabs, setTabs] = useState(['New File']);
   const [filename, setFileName] = useState('');
   const [theme, setTheme] = useState(localStorage.getItem('editorTheme') || 'github');
   const [fontSize, setFontSize] = useState(localStorage.getItem('font') || '14');
-  const [mode, setMode] = useState('dark')
 
   useEffect(() => {
     Socket.emit('is logged in');
@@ -29,6 +28,7 @@ export default function App() {
   }, []);
 
   const handleLogout = () => {
+    console.log("user logged out")
     Socket.emit('logout');
     setIsLoggedIn(false);
   };
@@ -113,7 +113,7 @@ export default function App() {
         </Tabs>
       </AppBar>
 
-      {tabs.map((item, i) => <OneTab mode={mode} changeFontSize={handleFontSize} fontSize={fontSize} updateUser={updateUser} theme={theme} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user} />)}
+      {tabs.map((item, i) => <OneTab changeFontSize={handleFontSize} fontSize={fontSize} updateUser={updateUser} theme={theme} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user} />)}
     </>
   );
 }

@@ -3,16 +3,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import ComputerIcon from '@material-ui/icons/Computer';
 import { CSSTransition } from 'react-transition-group';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import Brightness4Icon from '@material-ui/icons/Brightness4';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import Logo from './logo';
 import CaretIcon from './Caret';
 import GithubOauth from './GithubOauth';
 import GithubLogout from './GithubLogout';
-import Brightness7Icon from '@material-ui/icons/Brightness7';
-import Brightness3Icon from '@material-ui/icons/Brightness3';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import TextFormatIcon from '@material-ui/icons/TextFormat';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import GitHubIcon from '@material-ui/icons/GitHub';
+import HomeIcon from '@material-ui/icons/Home';
+import DevicesIcon from '@material-ui/icons/Devices';
 import {
   BrowserRouter as Router,
   Switch,
@@ -29,10 +29,14 @@ function Settings({
   return (
     <>
       <Navtop isLoggedIn={isLoggedIn} handleLogout={handleLogout}>
-        <NavItem icon={<CaretIcon />}>
+        <NavItem link="/home" icon={<HomeIcon />} />
+        <NavItem link="/" icon={<DevicesIcon />} />
+        { !isLoggedIn &&  <NavItem github={true} icon={<GitHubIcon />} /> }
+        <NavItem link="#" icon={<CaretIcon />}>
           <DropdownMenu
             changeTheme={changeTheme}
             handleFontSize={handleFontSize}
+            handleLogout={handleLogout}
             user={user}
             isLoggedIn={isLoggedIn}
           />
@@ -47,10 +51,7 @@ function Navtop(props) {
     <nav className="navbar">
       <h2 style={{ padding: '0', margin: '0%', alignItems: 'center' }} className="logoLeft">Codelint</h2>
       <div style={{ alignItems: 'center', width: '100%' }} className="navbar-nav">
-        {!props.isLoggedIn && <GithubOauth /> || props.children && <GithubLogout handleLogout={props.handleLogout}/>}
-        {useLocation().pathname !== "/" && <Link to="/">Home</Link>}
-        {useLocation().pathname !== "/about" && <Link to="/about">About</Link>}
-        <ul>
+        <ul className="navbar-nav">
           {props.children}
         </ul>
       </div>
@@ -60,9 +61,17 @@ function Navtop(props) {
 
 function NavItem(props) {
   const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    if (props.github)
+      GithubOauth()
+    else
+      setOpen(!open)
+  }
+
   return (
     <li className="nav-item">
-      <a href="#" className="icon-button" onClick={() => setOpen(!open)}>
+      <a href={props.link} className="icon-button" onClick={handleClick}>
         {props.icon}
       </a>
       {open && props.children}
@@ -70,7 +79,7 @@ function NavItem(props) {
   );
 }
 
-function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn}) {
+function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLogout}) {
   const [activeMenu, setActiveMenu] = useState('main');
   const [menuHeight, setMenuHeight] = useState(null);
   const dropdownRef = useRef(null);
@@ -88,6 +97,10 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn}) {
       if (props.goToMenu) { setActiveMenu(props.goToMenu); }
       if (props.value) { props.changeTheme(props.value); }
       if (props.size) { props.changeFontSize(props.size) }
+      if (props.logout) {
+        props.handleLogout()
+        setActiveMenu(props.goToMenu);
+      }
     };
     return (
       <a href="#" className="menu-item" onClick={handleChange}>
@@ -108,12 +121,6 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn}) {
         <div className="menu">
           {isLoggedIn && <DropdownItem>{user}</DropdownItem>}
           <DropdownItem
-            leftIcon={<Brightness4Icon />}
-            goToMenu="theme"
-          >
-            Theme Mode
-          </DropdownItem>
-          <DropdownItem
             leftIcon={<ComputerIcon />}
             goToMenu="editor"
           >
@@ -126,22 +133,17 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn}) {
             Editor Font Size
           </DropdownItem>
 
-        </div>
-      </CSSTransition>
+          {
+            isLoggedIn &&
+              <DropdownItem
+                logout={true}
+                handleLogout={handleLogout}
+                leftIcon={<ExitToAppIcon />}
+                >
+                Logout
+              </DropdownItem>
+          }
 
-      <CSSTransition
-        in={activeMenu === 'theme'}
-        timeout={500}
-        classNames="menu-secondary"
-        unmountOnExit
-        onEnter={calcHeight}
-      >
-        <div className="menu">
-          <DropdownItem goToMenu="main" leftIcon={<ArrowBackIosIcon />}>
-            <h4>Go Back</h4>
-          </DropdownItem>
-          <DropdownItem leftIcon={<Brightness7Icon />}>Light Mode</DropdownItem>
-          <DropdownItem leftIcon={<Brightness3Icon />}>Dark Mode</DropdownItem>
         </div>
       </CSSTransition>
 

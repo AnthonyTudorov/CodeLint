@@ -7,8 +7,8 @@ export default function Main() {
     return(
       <main>
         <Switch>
-          <Route exact path='/' component={App}/>
-          <Route path='/about' component={About}/>
+          <Route exact path='/home' component={About}/>
+          <Route path='/' component={App}/>
         </Switch>
       </main>
      );

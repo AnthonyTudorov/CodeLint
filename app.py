@@ -28,10 +28,9 @@ def main():
             auth_user(github_code, state)
     return flask.render_template('index.html')
     
-@app.route('/about')
+@app.route('/home')
 def about():
     return flask.render_template('index.html')
-
 
 @socketio.on('connect')
 def on_connect():

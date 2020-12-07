@@ -15,10 +15,6 @@ html, body {
     padding: 0;
 }
 
-.body_dark {
-    background-color: #242526;
-}
-
 .div-error {
     width: 70%;
     margin: 0 auto;
