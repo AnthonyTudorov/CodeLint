@@ -14,6 +14,7 @@ import Settings from './Settings'
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import About from './About'
 
 export default function App() {
   const [value, setValue] = useState(0);
@@ -146,6 +147,7 @@ export default function App() {
       </AppBar>
 
       {tabs.map((item, i) => <OneTab changeFontSize={handleFontSize} fontSize={fontSize} updateUser={updateUser} theme={theme} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user} />)}
+      
     </>
   );
 }
