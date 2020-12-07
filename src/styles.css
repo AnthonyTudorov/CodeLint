@@ -9,10 +9,14 @@
 }
 
 html, body {
-    height: 98%;
+    height: 100%;
     font-family: proxima-nova;
     margin: 0;
     padding: 0;
+}
+
+.body_dark {
+    background-color: #242526;
 }
 
 .div-error {
@@ -42,8 +46,4 @@ html, body {
     color: white;
     margin-right: 2em;
     font-size: 5em;
-}
-
-.logoLeft{
-
 }
