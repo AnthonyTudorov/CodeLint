@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Socket from './Socket';
 import OneTab from './OneTab';
 import Settings from './Settings'
-import './styles.css'
 
 export default function App() {
   const [value, setValue] = useState(0);

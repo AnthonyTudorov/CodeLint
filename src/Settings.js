@@ -13,6 +13,15 @@ import Brightness7Icon from '@material-ui/icons/Brightness7';
 import Brightness3Icon from '@material-ui/icons/Brightness3';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import TextFormatIcon from '@material-ui/icons/TextFormat';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useLocation
+} from "react-router-dom";
+import App from './App'
+import About from './About'
 
 function Settings({
   changeTheme, isLoggedIn, handleLogout, user, handleFontSize
@@ -38,9 +47,11 @@ function Navtop(props) {
     <nav className="navbar">
       <h2 style={{ padding: '0', margin: '0%', alignItems: 'center' }} className="logoLeft">Codelint</h2>
       <div style={{ alignItems: 'center', width: '100%' }} className="navbar-nav">
+        {!props.isLoggedIn && <GithubOauth /> || props.children && <GithubLogout handleLogout={props.handleLogout}/>}
+        {useLocation().pathname !== "/" && <Link to="/">Home</Link>}
+        {useLocation().pathname !== "/about" && <Link to="/about">About</Link>}
         <ul>
           {props.children}
-           {/*{!props.isLoggedIn && <GithubOauth /> || props.children && <GithubLogout handleLogout={props.handleLogout}/>}*/}
         </ul>
       </div>
     </nav>
