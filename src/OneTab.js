@@ -5,9 +5,11 @@ import Top from './Top';
 import Editor from './Editor';
 import Socket from './Socket';
 import './styles.css';
+import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
 
 export default function OneTab({
-  index, currentTab, updateUser, updateLoggedIn, user, theme, fontSize, changeFontSize,
+  index, currentTab, updateUser, updateLoggedIn, user, theme, fontSize, changeFontSize, mode
 }) {
   console.log(`from repos: ${user}`);
   const [code, setCode] = useState(localStorage.getItem(`code${index}` || ''));
@@ -30,6 +32,9 @@ export default function OneTab({
   const commitMessage = useRef('');
 
   useEffect(() => {
+    if (mode === "dark") {
+      applyDarkMode()
+    }
     Socket.on('logged in status', ({ logged_in, user_info }) => {
       if (logged_in === true) {
         updateUser(user_info.login);
@@ -80,7 +85,15 @@ export default function OneTab({
     Socket.on('output', ({ linter, output, tab }) => {
       localStorage.setItem(`errors${tab}`, output);
       setLoading(false);
-      if (index === tab) { setCurrentTabErrors(parse(output)); }
+      if (index === tab) {
+        if (mode === 'dark') {
+          setCurrentTabErrors(parse(output));
+          applyDarkMode()
+        }
+        else {
+          setCurrentTabErrors(parse(output));
+        }
+      }
     });
 
     Socket.on('fixed', ({
@@ -91,7 +104,13 @@ export default function OneTab({
       setLoading(false);
       if (index === tab) {
         setCode(file_contents);
-        setCurrentTabErrors(parse(output));
+        if (mode === 'dark') {
+          setCurrentTabErrors(parse(output));
+          applyDarkMode()
+        }
+        else {
+          setCurrentTabErrors(parse(output));
+        }
       }
     });
 
@@ -102,6 +121,35 @@ export default function OneTab({
       Socket.close();
     };
   }, []);
+
+  const applyDarkMode = () => {
+    document.body.style.backgroundColor = "#242526"
+    if (localStorage.getItem(`errors${index}`) && localStorage.getItem(`errors${index}`).includes('ESLint Report')) {
+      const x = document.getElementsByTagName("tr");
+      if (x) {
+        const byclass = document.getElementsByClassName('f-0')
+        for (let i of byclass) {
+          i.children.item(2).style.color = "white"
+          i.children.item(3).getElementsByTagName('a')[0].style.color = '#0496FF'
+        }
+        if (localStorage.getItem(`errors${index}`)) {
+          const newColors = document.getElementsByClassName('code')[0].innerHTML
+          localStorage.setItem(`errors${index}`, newColors);
+          if (currentTab === index) {
+            setCurrentTabErrors(parse(newColors))
+          }
+        }
+      }
+    }
+  }
+  const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+  }));
+  const classes = useStyles();
 
   const handleChange = (newValue) => {
     localStorage.setItem(`code${index}`, newValue);
@@ -222,7 +270,7 @@ export default function OneTab({
   };
 
   const element = () => (
-    <div className="body">
+    <div className={mode === 'light' ? "body_light" : 'body_dark'}>
       <Top
         handleSelectedRepo={handleSelectedRepo}
         selectedRepo={selectedRepo}
@@ -244,6 +292,7 @@ export default function OneTab({
       >
         <p className="error">{promptError}</p>
       </div>
+      <div className="middle_content">
       <Editor
         handleChange={handleChange}
         code={code}
@@ -251,11 +300,19 @@ export default function OneTab({
         fontSize={fontSize}
         linter={linter}
       />
-      <button type="submit" className="lintbutton" onClick={handleClick}>Lint!</button>
-      <button type="submit" className="lintbutton" onClick={handleFix}>Fix!</button>
-      <button type="submit" className="lintbutton" onClick={handleCommit}>Commit!</button>
-      <input type="text" ref={commitMessage} />
-
+        <div style={{'display': 'flex', 'justifyContent': 'flex-end'}} className={classes.root}>
+             <Button onClick={handleClick} type="submit" variant="contained" style={{ 'backgroundColor': '#0496FF', 'color': 'white'}}>
+              Lint
+            </Button>
+            <Button onClick={handleFix} type="submit" variant="contained" style={{ 'backgroundColor': '#0496FF', 'color': 'white'}}>
+              Fix
+            </Button>
+            <Button onClick={handleCommit} type="submit" variant="contained" style={{ 'backgroundColor': '#0496FF', 'color': 'white'}}>
+              Commit
+            </Button>
+        </div>
+      </div>
+      {/*<input type="text" ref={commitMessage} />*/}
       <br />
       { currentTab === index ? (
         <div className="code">

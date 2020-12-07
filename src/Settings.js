@@ -34,6 +34,7 @@ function Settings({
             changeTheme={changeTheme}
             handleFontSize={handleFontSize}
             user={user}
+            isLoggedIn={isLoggedIn}
           />
         </NavItem>
       </Navtop>
@@ -69,7 +70,7 @@ function NavItem(props) {
   );
 }
 
-function DropdownMenu({ changeTheme, user, handleFontSize }) {
+function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn}) {
   const [activeMenu, setActiveMenu] = useState('main');
   const [menuHeight, setMenuHeight] = useState(null);
   const dropdownRef = useRef(null);
@@ -105,7 +106,7 @@ function DropdownMenu({ changeTheme, user, handleFontSize }) {
         onEnter={calcHeight}
       >
         <div className="menu">
-          <DropdownItem>{user}</DropdownItem>
+          {isLoggedIn && <DropdownItem>{user}</DropdownItem>}
           <DropdownItem
             leftIcon={<Brightness4Icon />}
             goToMenu="theme"
