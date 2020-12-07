@@ -18,8 +18,6 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('editorTheme') || 'tomorrow');
   const [fontSize, setFontSize] = useState(localStorage.getItem('font') || '14');
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
 
   useEffect(() => {
     Socket.emit('is logged in');

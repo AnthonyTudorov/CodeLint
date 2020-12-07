@@ -72,6 +72,16 @@ a {
   filter: brightness(1.2);
 }
 
+img {
+  border-radius: 50%;
+}
+
+.icon-button img {
+  fill: var(--text-color);
+  width: 20px;
+  height: 20px;
+}
+
 .icon-button svg {
   fill: var(--text-color);
   width: 20px;

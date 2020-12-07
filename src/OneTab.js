@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 
 export default function OneTab({
-  index, currentTab, updateUser, updateLoggedIn, user, theme, fontSize, changeFontSize, mode
+  index, currentTab, updateUser, updateLoggedIn, user, theme, fontSize, changeFontSize, mode, handleProfilePhoto
 }) {
   console.log(`from repos: ${user}`);
   const [code, setCode] = useState(localStorage.getItem(`code${index}` || ''));
@@ -38,6 +38,7 @@ export default function OneTab({
     Socket.on('logged in status', ({ logged_in, user_info }) => {
       if (logged_in === true) {
         updateUser(user_info.login);
+        handleProfilePhoto(user_info.profile_image)
         setUsername((username) => user_info.login);
         updateLoggedIn(true);
         Socket.emit('get repos', { index });
@@ -46,9 +47,11 @@ export default function OneTab({
       }
     });
 
-    Socket.on('user data', ({ login }) => {
+    Socket.on('user data', ({ login, profile_image }) => {
       setUsername((username) => login);
       updateUser(login);
+      console.log(profile_image)
+      handleProfilePhoto(profile_image)
       updateLoggedIn(true);
       Socket.emit('get repos', { index });
     });

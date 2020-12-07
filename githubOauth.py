@@ -212,5 +212,3 @@ def commit_changes(user_id, repo_url, default_branch, files, commit_message):
         return {'commit_success': False, 'error': 'bad github token'}
     commit = commit.json()
     update_branch_reference(user_id, repo_url, default_branch, commit['sha'])
-    
-    

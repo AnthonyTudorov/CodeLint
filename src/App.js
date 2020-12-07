@@ -20,6 +20,7 @@ export default function App() {
   const [filename, setFileName] = useState('');
   const [theme, setTheme] = useState(localStorage.getItem('editorTheme') || 'github');
   const [fontSize, setFontSize] = useState(localStorage.getItem('font') || '14');
+  const [profilePhoto, setProfilePhoto] = useState(localStorage.getItem('photo') || '')
 
   useEffect(() => {
     Socket.emit('is logged in');
@@ -28,7 +29,6 @@ export default function App() {
   }, []);
 
   const handleLogout = () => {
-    console.log("user logged out")
     Socket.emit('logout');
     setIsLoggedIn(false);
   };
@@ -36,6 +36,11 @@ export default function App() {
   const handleChange = (e, val) => {
     if (e.constructor.name !== 'SyntheticEvent')
       setValue(val);
+  };
+
+  const handleProfilePhoto = (photo) => {
+    setProfilePhoto(photo)
+    localStorage.setItem('photo', photo);
   };
 
   const updateUser = (usr) => {
@@ -92,7 +97,7 @@ export default function App() {
 
   return (
     <>
-      <Settings handleFontSize={handleFontSize} user={user} isLoggedIn={isLoggedIn} handleLogout={handleLogout} changeTheme={handleTheme} />
+      <Settings profilePhoto={profilePhoto} handleFontSize={handleFontSize} user={user} isLoggedIn={isLoggedIn} handleLogout={handleLogout} changeTheme={handleTheme} />
       <AppBar style={{'backgroundColor': '#0496FF'}} position="static">
         <Tabs variant="scrollable" value={value} onChange={handleChange}>
           {tabs.map((item) => <Tab label={item} /> )}
@@ -113,7 +118,7 @@ export default function App() {
         </Tabs>
       </AppBar>
 
-      {tabs.map((item, i) => <OneTab changeFontSize={handleFontSize} fontSize={fontSize} updateUser={updateUser} theme={theme} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user} />)}
+      {tabs.map((item, i) => <OneTab handleProfilePhoto={handleProfilePhoto} changeFontSize={handleFontSize} fontSize={fontSize} updateUser={updateUser} theme={theme} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user} />)}
     </>
   );
 }

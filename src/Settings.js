@@ -6,7 +6,6 @@ import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import CaretIcon from './Caret';
 import GithubOauth from './GithubOauth';
-import GithubLogout from './GithubLogout';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import TextFormatIcon from '@material-ui/icons/TextFormat';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -24,10 +23,11 @@ import App from './App'
 import About from './About'
 
 function Settings({
-  changeTheme, isLoggedIn, handleLogout, user, handleFontSize
+  changeTheme, isLoggedIn, handleLogout, user, handleFontSize, profilePhoto
 }) {
   return (
     <>
+      {console.log(profilePhoto)}
       <Navtop isLoggedIn={isLoggedIn} handleLogout={handleLogout}>
         <NavItem link="/home" icon={<HomeIcon />} />
         <NavItem link="/" icon={<DevicesIcon />} />
@@ -38,6 +38,7 @@ function Settings({
             handleFontSize={handleFontSize}
             handleLogout={handleLogout}
             user={user}
+            profilePhoto={profilePhoto}
             isLoggedIn={isLoggedIn}
           />
         </NavItem>
@@ -79,7 +80,7 @@ function NavItem(props) {
   );
 }
 
-function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLogout}) {
+function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLogout, profilePhoto}) {
   const [activeMenu, setActiveMenu] = useState('main');
   const [menuHeight, setMenuHeight] = useState(null);
   const dropdownRef = useRef(null);
@@ -119,7 +120,8 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLog
         onEnter={calcHeight}
       >
         <div className="menu">
-          {isLoggedIn && <DropdownItem>{user}</DropdownItem>}
+          {console.log(profilePhoto)}
+          {isLoggedIn && <DropdownItem leftIcon={<img src={profilePhoto} />}>{user}</DropdownItem>}
           <DropdownItem
             leftIcon={<ComputerIcon />}
             goToMenu="editor"
