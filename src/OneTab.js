@@ -6,6 +6,7 @@ import Editor from './Editor';
 import Socket from './Socket';
 import './styles.css';
 import Button from '@material-ui/core/Button';
+import CommitButton from './CommitButton'
 import { makeStyles } from '@material-ui/core/styles';
 
 export default function OneTab({
@@ -29,7 +30,7 @@ export default function OneTab({
   const [currentTabErrors, setCurrentTabErrors] = useState(localStorage.getItem(`errors${index}`)
                                        && parse(localStorage.getItem(`errors${index}`)) || '');
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
-  const commitMessage = useRef('');
+  
 
   useEffect(() => {
     if (mode === "dark") {
@@ -250,9 +251,8 @@ export default function OneTab({
     setPromptError('');
   };
 
-  const handleCommit = () => {
-    commitMessage.current.focus();
-    if (commitMessage.current.value && code) {
+  const handleCommit = (message) => {
+    if (message && code) {
       let found = false;
       allRepoInfo.forEach(([repo_name, url, default_branch]) => {
         if (selectedRepo === repo_name && !found) {
@@ -263,9 +263,8 @@ export default function OneTab({
               path: selectedFile,
               content: code,
             }],
-            commit_message: commitMessage.current.value,
+            commit_message: message,
           });
-          commitMessage.current.value = '';
           found = true;
         }
       });
@@ -310,12 +309,9 @@ export default function OneTab({
             <Button onClick={handleFix} type="submit" variant="contained" style={{ 'backgroundColor': '#0496FF', 'color': 'white'}}>
               Fix
             </Button>
-            <Button onClick={handleCommit} type="submit" variant="contained" style={{ 'backgroundColor': '#0496FF', 'color': 'white'}}>
-              Commit
-            </Button>
+            <CommitButton handleCommit={handleCommit} />
         </div>
       </div>
-      {/*<input type="text" ref={commitMessage} />*/}
       <br />
       { currentTab === index ? (
         <div className="code">
