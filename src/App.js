@@ -17,20 +17,41 @@ export default function App() {
   const [user, setUser] = useState(localStorage.getItem('username') || '');
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('username') && true || false);
   const [tabs, setTabs] = useState(['New File']);
-  const [filename, setFileName] = useState('');
+  const [filename, setFilename] = useState('');
   const [theme, setTheme] = useState(localStorage.getItem('editorTheme') || 'github');
   const [fontSize, setFontSize] = useState(localStorage.getItem('font') || '14');
   const [profilePhoto, setProfilePhoto] = useState(localStorage.getItem('photo') || '')
+  const [clearFirstTab, setClearFirstTab] = useState(false);
 
   useEffect(() => {
     Socket.emit('is logged in');
     const oldTabs = localStorage.getItem('tabs');
     if (oldTabs) setTabs(oldTabs.split(','));
   }, []);
-
+  
+  useEffect(() => {
+    setTabs(['New File']);
+  }, [clearFirstTab]);
+  
   const handleLogout = () => {
     Socket.emit('logout');
+    localStorage.removeItem('username');
+    localStorage.removeItem('photo');
+    for(let i=0;i<tabs.length;i++) {
+      localStorage.removeItem('code'+String(i));
+      localStorage.removeItem('selectedRepo'+String(i));
+      localStorage.removeItem('selectedFile'+String(i));
+      localStorage.removeItem('linter'+String(i));
+      localStorage.removeItem('styleguide'+String(i));
+      localStorage.removeItem('errors'+String(i));
+    }
+    localStorage.removeItem('repo_tree');
+    localStorage.removeItem('repo_tree_files');
+    localStorage.removeItem('allRepoInfo');
+    localStorage.removeItem('tabs');
     setIsLoggedIn(false);
+    setTabs([]);
+    setClearFirstTab(!clearFirstTab);
   };
 
   const handleChange = (e, val) => {
@@ -66,10 +87,11 @@ export default function App() {
     }
     localStorage.setItem('tabs', `${tabs},${filename}`);
     setTabs((prestate) => [...prestate, filename]);
+    setFilename('');
   };
 
   const handleFilename = (e) => {
-    setFileName(e.target.value);
+    setFilename(e.target.value);
   };
 
   const handleSubmit = (e) => {
