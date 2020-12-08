@@ -30,7 +30,9 @@ export default function App() {
   }, []);
   
   useEffect(() => {
-    setTabs(['New File']);
+    if (!localStorage.getItem('tabs')) {
+      setTabs(['New File']);
+    }
   }, [clearFirstTab]);
   
   const handleLogout = () => {
