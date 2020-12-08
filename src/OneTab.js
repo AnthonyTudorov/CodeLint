@@ -38,6 +38,7 @@ export default function OneTab({
     }
     Socket.on('logged in status', ({ logged_in, user_info }) => {
       if (logged_in === true) {
+        console.log(user_info)
         updateUser(user_info.login);
         handleProfilePhoto(user_info.profile_image)
         setUsername((username) => user_info.login);
@@ -49,9 +50,9 @@ export default function OneTab({
     });
 
     Socket.on('user data', ({ login, profile_image }) => {
+      console.log(login)
       setUsername((username) => login);
       updateUser(login);
-      console.log(profile_image)
       handleProfilePhoto(profile_image)
       updateLoggedIn(true);
       Socket.emit('get repos', { index });

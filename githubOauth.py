@@ -48,7 +48,6 @@ def auth_user(code, state):
     res = requests.post('https://github.com/login/oauth/access_token',
                       params=params,
                       headers=headers).json()
-    print(res)
     access_token = res['access_token']
 
     log_user_info(access_token)

@@ -44,6 +44,7 @@ def on_disconnect():
 
 @socketio.on('is logged in')
 def on_is_logged_in():
+    print(session['user_id'])
     if 'user_id' in session:
         user_id = escape(session.get('user_id'))
         if models.Users.query.filter_by(user_id=user_id).first() is not None:
