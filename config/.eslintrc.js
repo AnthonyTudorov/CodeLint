@@ -21,5 +21,6 @@ module.exports = {
     'linebreak-style': 'off',
     'react/jsx-filename-extension': 'off',
     'import/no-unresolved': 'off',
+    'no-console': 'off'
   },
 };

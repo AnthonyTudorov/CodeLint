@@ -1,6 +1,8 @@
 '''Sets up our db'''
 # pylint: disable=no-member, missing-function-docstring
 from settings import db
+
+
 class Users(db.Model):
     '''Main class that handles our db columns'''
     id = db.Column(db.Integer, primary_key=True)
@@ -11,7 +13,8 @@ class Users(db.Model):
     user_id = db.Column(db.String(120), unique=True, nullable=False)
     access_token = db.Column(db.LargeBinary(), unique=True)
 
-    def __init__(self, login, name, email, profile_image, user_id, access_token):
+    def __init__(self, login, name, email, profile_image, user_id,
+                 access_token):
         self.login = login
         self.name = name
         self.email = email

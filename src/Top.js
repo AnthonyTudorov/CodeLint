@@ -2,9 +2,8 @@
 import React from 'react';
 import 'react-dropdown/style.css';
 import './top.css';
-import Dropmenu from './Dropmenu';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import Dropmenu from './Dropmenu';
 
 export default function Top({
   handleLinter, handleSelectedRepo, linter, repos, handleRepoTree, repoTreeFiles,

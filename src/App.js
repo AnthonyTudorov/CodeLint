@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { v4 as uuidv4 } from 'uuid';
 import Socket from './Socket';
 import OneTab from './OneTab';
-import Settings from './Settings'
+import Settings from './Settings';
 
 export default function App() {
   const [value, setValue] = useState(0);
@@ -20,7 +20,7 @@ export default function App() {
   const [filename, setFilename] = useState('');
   const [theme, setTheme] = useState(localStorage.getItem('editorTheme') || 'github');
   const [fontSize, setFontSize] = useState(localStorage.getItem('font') || '14');
-  const [profilePhoto, setProfilePhoto] = useState(localStorage.getItem('photo') || '')
+  const [profilePhoto, setProfilePhoto] = useState(localStorage.getItem('photo') || '');
   const [clearFirstTab, setClearFirstTab] = useState(false);
 
   useEffect(() => {
@@ -28,24 +28,24 @@ export default function App() {
     const oldTabs = localStorage.getItem('tabs');
     if (oldTabs) setTabs(oldTabs.split(','));
   }, []);
-  
+
   useEffect(() => {
     if (!localStorage.getItem('tabs')) {
       setTabs(['New File']);
     }
   }, [clearFirstTab]);
-  
+
   const handleLogout = () => {
     Socket.emit('logout');
     localStorage.removeItem('username');
     localStorage.removeItem('photo');
-    for(let i=0;i<tabs.length;i++) {
-      localStorage.removeItem('code'+String(i));
-      localStorage.removeItem('selectedRepo'+String(i));
-      localStorage.removeItem('selectedFile'+String(i));
-      localStorage.removeItem('linter'+String(i));
-      localStorage.removeItem('styleguide'+String(i));
-      localStorage.removeItem('errors'+String(i));
+    for (let i = 0; i < tabs.length; i += 1) {
+      localStorage.removeItem(`code${String(i)}`);
+      localStorage.removeItem(`selectedRepo${String(i)}`);
+      localStorage.removeItem(`selectedFile${String(i)}`);
+      localStorage.removeItem(`linter${String(i)}`);
+      localStorage.removeItem(`styleguide${String(i)}`);
+      localStorage.removeItem(`errors${String(i)}`);
     }
     localStorage.removeItem('repo_tree');
     localStorage.removeItem('repo_tree_files');
@@ -58,12 +58,11 @@ export default function App() {
   };
 
   const handleChange = (e, val) => {
-    if (e.constructor.name !== 'SyntheticEvent')
-      setValue(val);
+    if (e.constructor.name !== 'SyntheticEvent') setValue(val);
   };
 
   const handleProfilePhoto = (photo) => {
-    setProfilePhoto(photo)
+    setProfilePhoto(photo);
     localStorage.setItem('photo', photo);
   };
 
@@ -122,10 +121,17 @@ export default function App() {
 
   return (
     <>
-      <Settings profilePhoto={profilePhoto} handleFontSize={handleFontSize} user={user} isLoggedIn={isLoggedIn} handleLogout={handleLogout} changeTheme={handleTheme} />
-      <AppBar style={{'backgroundColor': '#0496FF'}} position="static">
+      <Settings
+        profilePhoto={profilePhoto}
+        handleFontSize={handleFontSize}
+        user={user}
+        isLoggedIn={isLoggedIn}
+        handleLogout={handleLogout}
+        changeTheme={handleTheme}
+      />
+      <AppBar style={{ backgroundColor: '#0496FF' }} position="static">
         <Tabs variant="scrollable" value={value} onChange={handleChange}>
-          {tabs.map((item) => <Tab label={item} /> )}
+          {tabs.map((item) => <Tab label={item} />)}
 
           <form className={classes.root} type="submit" onSubmit={handleSubmit} noValidate autoComplete="off">
             <TextField
@@ -143,7 +149,19 @@ export default function App() {
         </Tabs>
       </AppBar>
 
-      {tabs.map((item, i) => <OneTab handleProfilePhoto={handleProfilePhoto} changeFontSize={handleFontSize} fontSize={fontSize} updateUser={updateUser} theme={theme} updateLoggedIn={updateLoggedIn} index={i} currentTab={value} user={user} />)}
+      {tabs.map((item, i) => (
+        <OneTab
+          handleProfilePhoto={handleProfilePhoto}
+          changeFontSize={handleFontSize}
+          fontSize={fontSize}
+          updateUser={updateUser}
+          theme={theme}
+          updateLoggedIn={updateLoggedIn}
+          index={i}
+          currentTab={value}
+          user={user}
+        />
+      ))}
     </>
   );
 }

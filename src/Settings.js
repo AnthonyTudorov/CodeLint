@@ -1,11 +1,11 @@
+/* eslint react/destructuring-assignment: 0 */
+/* eslint jsx-a11y/control-has-associated-label: 0 */
 import './settings.css';
 import React, { useState, useEffect, useRef } from 'react';
 import ComputerIcon from '@material-ui/icons/Computer';
 import { CSSTransition } from 'react-transition-group';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import CaretIcon from './Caret';
-import GithubOauth from './GithubOauth';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import TextFormatIcon from '@material-ui/icons/TextFormat';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -17,21 +17,22 @@ import {
   Switch,
   Route,
   Link,
-  useLocation
-} from "react-router-dom";
-import App from './App'
-import About from './About'
+  useLocation,
+} from 'react-router-dom';
+import GithubOauth from './GithubOauth';
+import CaretIcon from './Caret';
+import App from './App';
+import About from './About';
 
 function Settings({
-  changeTheme, isLoggedIn, handleLogout, user, handleFontSize, profilePhoto
+  changeTheme, isLoggedIn, handleLogout, user, handleFontSize, profilePhoto,
 }) {
   return (
     <>
-      {console.log(profilePhoto)}
       <Navtop isLoggedIn={isLoggedIn} handleLogout={handleLogout}>
         <NavItem link="/home" icon={<HomeIcon />} />
         <NavItem link="/" icon={<DevicesIcon />} />
-        { !isLoggedIn &&  <NavItem github={true} icon={<GitHubIcon />} /> }
+        { !isLoggedIn && <NavItem github icon={<GitHubIcon />} /> }
         <NavItem link="#" icon={<CaretIcon />}>
           <DropdownMenu
             changeTheme={changeTheme}
@@ -64,11 +65,9 @@ function NavItem(props) {
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
-    if (props.github)
-      GithubOauth()
-    else
-      setOpen(!open)
-  }
+    if (props.github) GithubOauth();
+    else setOpen(!open);
+  };
 
   return (
     <li className="nav-item">
@@ -80,7 +79,9 @@ function NavItem(props) {
   );
 }
 
-function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLogout, profilePhoto}) {
+function DropdownMenu({
+  changeTheme, user, handleFontSize, isLoggedIn, handleLogout, profilePhoto,
+}) {
   const [activeMenu, setActiveMenu] = useState('main');
   const [menuHeight, setMenuHeight] = useState(null);
   const dropdownRef = useRef(null);
@@ -97,9 +98,9 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLog
     const handleChange = () => {
       if (props.goToMenu) { setActiveMenu(props.goToMenu); }
       if (props.value) { props.changeTheme(props.value); }
-      if (props.size) { props.changeFontSize(props.size) }
+      if (props.size) { props.changeFontSize(props.size); }
       if (props.logout) {
-        props.handleLogout()
+        props.handleLogout();
         setActiveMenu(props.goToMenu);
       }
     };
@@ -120,8 +121,7 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLog
         onEnter={calcHeight}
       >
         <div className="menu">
-          {console.log(profilePhoto)}
-          {isLoggedIn && <DropdownItem leftIcon={<img src={profilePhoto} />}>{user}</DropdownItem>}
+          {isLoggedIn && <DropdownItem leftIcon={<img alt="profile pic" src={profilePhoto} />}>{user}</DropdownItem>}
           <DropdownItem
             leftIcon={<ComputerIcon />}
             goToMenu="editor"
@@ -136,14 +136,16 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLog
           </DropdownItem>
 
           {
-            isLoggedIn &&
+            isLoggedIn
+              && (
               <DropdownItem
-                logout={true}
+                logout
                 handleLogout={handleLogout}
                 leftIcon={<ExitToAppIcon />}
-                >
+              >
                 Logout
               </DropdownItem>
+              )
           }
 
         </div>
@@ -185,13 +187,13 @@ function DropdownMenu({ changeTheme, user, handleFontSize, isLoggedIn, handleLog
           <DropdownItem goToMenu="main" leftIcon={<ArrowBackIosIcon />}>
             <h4>Go Back</h4>
           </DropdownItem>
-          <DropdownItem changeFontSize={handleFontSize} size='12' leftIcon={<TextFormatIcon />}>12</DropdownItem>
-          <DropdownItem changeFontSize={handleFontSize}  size='14' leftIcon={<TextFormatIcon />}>14</DropdownItem>
-          <DropdownItem changeFontSize={handleFontSize} size='16' leftIcon={<TextFormatIcon />}>16</DropdownItem>
-          <DropdownItem changeFontSize={handleFontSize} size='18' leftIcon={<TextFormatIcon />}>18</DropdownItem>
-          <DropdownItem changeFontSize={handleFontSize} size='20' leftIcon={<TextFormatIcon />}>20</DropdownItem>
-          <DropdownItem changeFontSize={handleFontSize} size='22' leftIcon={<TextFormatIcon />}>22</DropdownItem>
-          <DropdownItem changeFontSize={handleFontSize}  size='24' leftIcon={<TextFormatIcon />}>24</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size="12" leftIcon={<TextFormatIcon />}>12</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size="14" leftIcon={<TextFormatIcon />}>14</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size="16" leftIcon={<TextFormatIcon />}>16</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size="18" leftIcon={<TextFormatIcon />}>18</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size="20" leftIcon={<TextFormatIcon />}>20</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size="22" leftIcon={<TextFormatIcon />}>22</DropdownItem>
+          <DropdownItem changeFontSize={handleFontSize} size="24" leftIcon={<TextFormatIcon />}>24</DropdownItem>
         </div>
       </CSSTransition>
 
