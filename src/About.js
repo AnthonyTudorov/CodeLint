@@ -9,8 +9,10 @@ import times from "lodash/times";
 
 export default function App() {
   const [value, setValue] = useState(0);
-  const [user, setUser] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(localStorage.getItem('username') || '');
+  const [profilePhoto, setProfilePhoto] = useState(localStorage.getItem('photo') || '')
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('username') && true || false);
+  const [tabs, setTabs] = useState( (localStorage.getItem('tabs')) ? localStorage.getItem('tabs').split(',') : ['New File'] )
   const [theme, setTheme] = useState(localStorage.getItem('editorTheme') || 'tomorrow');
   const [fontSize, setFontSize] = useState(localStorage.getItem('font') || '14');
   const [windowheight, setWindowHeight] = useState(900)
@@ -33,6 +35,20 @@ export default function App() {
   }
   const handleLogout = () => {
     Socket.emit('logout');
+    localStorage.removeItem('username');
+    localStorage.removeItem('photo');
+    for(let i=0;i<tabs.length;i++) {
+      localStorage.removeItem('code'+String(i));
+      localStorage.removeItem('selectedRepo'+String(i));
+      localStorage.removeItem('selectedFile'+String(i));
+      localStorage.removeItem('linter'+String(i));
+      localStorage.removeItem('styleguide'+String(i));
+      localStorage.removeItem('errors'+String(i));
+    }
+    localStorage.removeItem('repo_tree');
+    localStorage.removeItem('repo_tree_files');
+    localStorage.removeItem('allRepoInfo');
+    localStorage.removeItem('tabs');
     setIsLoggedIn(false);
   };
 
@@ -59,7 +75,7 @@ export default function App() {
 
   return (
     <>
-      <Settings handleFontSize={handleFontSize} user={user} isLoggedIn={isLoggedIn} handleLogout={handleLogout} changeTheme={handleTheme} />
+      <Settings profilePhoto={profilePhoto} handleFontSize={handleFontSize} user={user} isLoggedIn={isLoggedIn} handleLogout={handleLogout} changeTheme={handleTheme} />
       <div style={{ height: windowheight.toString() + 'px', width: windowWidth.toString() + 'px' ,backgroundImage:`url(../static/background/background.jpg)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }} className="main-dropback">
         <h1>Codelint</h1>
         <h5>linting made easy</h5>
