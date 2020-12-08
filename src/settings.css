@@ -34,6 +34,7 @@ a {
   border-bottom: var(--border);
   max-width: 100%;
   display: flex;
+  z-index: 100;
 }
 
 /* <ul> */

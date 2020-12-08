@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Vollkorn:ital,wght@1,800&display=swap');
+
+.main-dropback {
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Vollkorn', serif;
+    font-size: 2em;
+    color: white;
+    overflow: hidden;
+    position: relative;
+}
+
+.main-dropback h1 {
+    color : white !important;
+}
+
+.about-us{
+    background-color: #242526;
+    text-align: center;
+    height: 800px;
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    color: white;
+    font-family: 'Vollkorn', serif;
+}
+
+.developers{
+    text-align: center;
+    font-family: 'Vollkorn', serif;
+}
+
+.dev-images {
+    width: 100vw;
+    display: flex;
+    align-content: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Vollkorn', serif;
+    font-size: 2em;
+    color: black;
+    overflow: hidden;
+    position: relative;
+}
+
+.one-dev p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.spacer {
+  margin-right: 4em;
+  margin-left: 4em;
+}
+
+.one-dev {
+  white-space: nowrap;
+  text-align: center;
+  align-content: center;
+  margin-right: 1em;
+  margin-left: 1em;
+}
+
+img {
+    height: 10em;
+    width: 10em;
+    margin-right: 4em;
+    margin-left: 4em;
+    /*max-width: 100%;*/
+}
+
+h1 {
+    margin: 0;
+}
+h5 {
+    margin: 0;
+}
+
+.main-dropback h1 {
+  border-right: solid 3px rgba(0,255,0,.75);
+  white-space: nowrap;
+  overflow: hidden;
+  font-family: 'Vollkorn', serif;
+  font-size: 28px;
+  color: black;
+  margin: 0 auto;
+  font-size: 2em;
+}
+
+.icon-bottom{
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+
+/* Animation */
+.main-dropback h1 {
+  animation: animated-text 1s steps(100,end) 1ms 1 normal both,
+             animated-cursor 600ms steps(100,end) infinite;
+}
+
+/* text animation */
+@keyframes animated-text{
+  from{width: 0;}
+  to{width: 255px;}
+}
+
+/* cursor animations */
+@keyframes animated-cursor{
+  from{border-right-color: rgba(0,255,0,.75);}
+  to{border-right-color: transparent;}
+}
