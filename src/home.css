@@ -28,13 +28,29 @@
     font-family: 'Vollkorn', serif;
 }
 
+.dev-imgs{
+    border-radius: 50%;
+}
+
+.tech-imgs {
+    border-radius: 0;
+    height: 5em;
+    width: 5em;
+}
+
+
+
+.about-paragraph{
+    padding-top: 1em;
+}
+
 .developers{
     text-align: center;
     font-family: 'Vollkorn', serif;
+    height: fit-content;
 }
 
 .dev-images {
-    width: 100vw;
     display: flex;
     align-content: center;
     flex-direction: row;
@@ -45,6 +61,8 @@
     color: black;
     overflow: hidden;
     position: relative;
+    margin-right: 3em;
+    margin-left: 3em;
 }
 
 .one-dev p {
@@ -68,9 +86,6 @@
 img {
     height: 10em;
     width: 10em;
-    margin-right: 4em;
-    margin-left: 4em;
-    /*max-width: 100%;*/
 }
 
 h1 {
@@ -114,4 +129,39 @@ h5 {
 @keyframes animated-cursor{
   from{border-right-color: rgba(0,255,0,.75);}
   to{border-right-color: transparent;}
+}
+
+@media screen and (max-width: 1168px) {
+  .dev-images {
+    display: flex;
+    align-content: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Vollkorn', serif;
+    font-size: 2em;
+    color: black;
+    overflow: hidden;
+    position: relative;
+    margin-right: 1em;
+    margin-left: 1em;
+    }
+}
+
+
+@media screen and (max-width: 911px) {
+  .dev-images {
+    display: flex;
+    align-content: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Vollkorn', serif;
+    font-size: 2em;
+    color: black;
+    overflow: hidden;
+    position: relative;
+    margin-right: 0.5em;
+    margin-left: 0.5em;
+    }
 }

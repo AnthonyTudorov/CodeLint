@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './home.css';
 import Socket from './Socket';
 import Settings from './Settings'
-import GitHubIcon from '@material-ui/icons/GitHub';
-import LinkedInIcon from '@material-ui/icons/LinkedIn';
-import Marquee, { Motion, randomIntFromInterval } from "react-marquee-slider";
-import times from "lodash/times";
+import GridSystem from './GridSystem'
+import BottomFooter from './Footer'
 
 export default function App() {
   const [value, setValue] = useState(0);
@@ -21,7 +19,6 @@ export default function App() {
   useEffect(() => {
     Socket.emit('is logged in');
     setWindowHeight(window.innerHeight)
-      console.log(window.innerWidth)
     window.addEventListener('resize', updateWindowDimensions);
 
      return () => {
@@ -84,99 +81,30 @@ export default function App() {
         <p></p>
       </div>
 
-         <div style={{ height: windowheight.toString() + 'px', width: windowWidth.toString() + 'px'}} className="developers">
+         <div style={{width: windowWidth.toString() + 'px'}} className="developers">
            <h1 style={{'paddingTop': '1em', 'textAlign': 'center'}}>Developers</h1>
-         <div style={{'marginTop': '2em'}} className="dev-images">
-           <div className="one-dev">
-                <img src='/static/developers/anthony.jpg' />
-                <p>Anthony Tudorov</p>
-               <div className='icon-bottom'>
-                    <div className='icon-button'>
-                        <a href="https://github.com/AnthonyTudorov"><GitHubIcon fontSize='large' /></a>
-                    </div>
-                    <div className='icon-button'>
-                       <a href="https://www.linkedin.com/in/anthony-tudorov/"><LinkedInIcon fontSize='large' /></a>
-                    </div>
-               </div>
-           </div>
-            <div className="one-dev">
-                <img src='/static/developers/rudra.jpg' />
-                <p>Rudra Desai</p>
-                <div className='icon-bottom'>
-                    <div className='icon-button'>
-                        <a href="https://github.com/rudra-desai"><GitHubIcon fontSize='large' /></a>
-                    </div>
-                    <div className='icon-button'>
-                        <a href="https://www.linkedin.com/in/rudra-desai/"><LinkedInIcon fontSize='large' /></a>
-                    </div>
-               </div>
-           </div>
+           <GridSystem info = {[
+              {name: 'Rudra Desai', imgsrc: '/static/developers/rudra.jpg', github: 'https://github.com/rudra-desai', linkedin : 'https://www.linkedin.com/in/rudra-desai/' },
+              {name: 'Anthony Tudorov', imgsrc: '/static/developers/anthony.jpg', github: 'https://github.com/AnthonyTudorov', linkedin : 'https://www.linkedin.com/in/anthony-tudorov/' },
+              {name: 'Joel Gonzalez', imgsrc: '/static/developers/joel.jpg', github: 'https://github.com/jg526', linkedin : 'https://www.linkedin.com/in/joel-gonzalez-84133515b/' },
+              {name: 'Chao-Yang Cheng', imgsrc: '/static/developers/chaoyang.jpg', github: 'https://github.com/weiwei87318', linkedin : 'https://www.linkedin.com/in/chao-yang-cheng-b9240a201/' }
+            ]} />
          </div>
-             <div style={{'marginTop': '2em'}} className="dev-images">
-           <div className="one-dev">
-                <img src='/static/developers/joel.jpg' />
-                <p>Joel Gonzalez</p>
-               <div className='icon-bottom'>
-                    <div className='icon-button'>
-                         <a href="https://github.com/jg526"><GitHubIcon fontSize='large' /></a>
-                    </div>
-                    <div className='icon-button'>
-                         <a href="https://www.linkedin.com/in/joel-gonzalez-84133515b/"><LinkedInIcon fontSize='large' /></a>
-                    </div>
-               </div>
-           </div>
-            <div className="one-dev">
-                <img src='/static/developers/chaoyang.jpg' />
-                <p>Chao-Yang Cheng</p>
-                <div className='icon-bottom'>
-                    <div className='icon-button'>
-                         <a href="https://github.com/weiwei87318"><GitHubIcon fontSize='large' /></a>
-                    </div>
-                    <div className='icon-button'>
-                        <a href="https://www.linkedin.com/in/chao-yang-cheng-b9240a201/"><LinkedInIcon fontSize='large' /></a>
-                    </div>
-               </div>
-           </div>
+       <div style={{background: "black", width: windowWidth.toString() + 'px'}} className="developers">
+           <h1 style={{ color: 'white', 'paddingTop': '1em', 'textAlign': 'center'}}>Technologies</h1>
+           <GridSystem info = {[
+              {name: 'Python', imgsrc: '/static/tech/python.png'},
+              {name: 'Flask', imgsrc: '/static/tech/flaskwhite.png'},
+              {name: 'React.js', imgsrc: '/static/tech/react.png'},
+              {name: 'Eslint', imgsrc: '/static/tech/eslint.png'},
+              {name: 'PostgreSQL', imgsrc: '/static/tech/postgresql.png'},
+              {name: 'GitHub', imgsrc: '/static/tech/githubwhite.png'}
+            ]} />
          </div>
-     </div>
-       <div style={{width: windowWidth.toString() + 'px'}} className="about-us">
-          <h1 style={{'paddingTop': '1em'}}>About</h1>
-          <p style={{'paddingTop': '1em'}}>Write a paragraph here</p>
-      </div>
-
-        <div className="about-us" style={{ paddingTop: '1em', color: 'black', background: 'white', height: '500px'}}>
-            <h1>Technologies</h1>
-  <Marquee velocity={10} minScale={0.7} resetAfterTries={200} scatterRandomly>
-    {times(6, Number).map((id) => (
-      <Motion
-        key={`child-${id}`}
-        initDeg={randomIntFromInterval(0, 180)}
-        direction={Math.random() > 0.5 ? "clockwise" : "counterclockwise"}
-        velocity={10}
-        radius={50}
-      >
-        <div
-          style={{
-            width: "300px",
-            height: "300px",
-            borderRadius: "50%",
-            backgroundColor: "",
-            textAlign: "center",
-            lineHeight: "50px",
-          }}
-        >
-            {[<img height='300px' width='300px' src="../static/tech/eslint.png" />,
-              <img height='300px' width='300px' src="../static/tech/flask.png" />,
-              <img height='300px' width='300px' src="../static/tech/github.png" />,
-              <img height='300px' width='300px' src="../static/tech/postgresql.png" />,
-              <img height='300px' width='300px' src="../static/tech/python.png" />,
-              <img height='300px' width='300px' src="../static/tech/react.png" />,
-            ][id]}
+        <div id="footer">
+            <BottomFooter />
         </div>
-      </Motion>
-    ))}
-  </Marquee>
-</div>;
+
     </>
   );
 }

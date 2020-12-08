@@ -3,7 +3,7 @@ import React from 'react';
 import 'react-dropdown/style.css';
 import './top.css';
 import Dropmenu from './Dropmenu';
-import loadingGif from './loading.gif';
+import loadingGif from '../static/loading.gif';
 
 export default function Top({
   handleLinter, handleSelectedRepo, linter, repos, handleRepoTree, repoTreeFiles,

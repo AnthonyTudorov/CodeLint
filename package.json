@@ -13,6 +13,7 @@
     "heroku": "^7.47.3",
     "html-react-parser": "^0.14.1",
     "random-username-generator": "^1.0.4",
+    "rc-footer": "^0.6.3",
     "react": "^16.13.1",
     "react-ace": "^9.2.0",
     "react-brace": "^3.6.6",
