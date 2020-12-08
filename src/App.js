@@ -53,6 +53,7 @@ export default function App() {
     localStorage.removeItem('tabs');
     setIsLoggedIn(false);
     setTabs([]);
+    setValue(0);
     setClearFirstTab(!clearFirstTab);
   };
 
