@@ -3,7 +3,8 @@ import React from 'react';
 import 'react-dropdown/style.css';
 import './top.css';
 import Dropmenu from './Dropmenu';
-import loadingGif from '../static/loading.gif';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 
 export default function Top({
   handleLinter, handleSelectedRepo, linter, repos, handleRepoTree, repoTreeFiles,
@@ -12,7 +13,7 @@ export default function Top({
   return (
     <>
       <div className="top">
-        {loading && <img height={25} width={25} src={loadingGif} alt="loading" />}
+        {loading && <CircularProgress />}
         <Dropmenu
           handleDropdown={handleLinter}
           value={linter}
