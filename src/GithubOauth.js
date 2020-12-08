@@ -6,6 +6,6 @@ export default function GithubOauth() {
     Socket.emit('store state', {
       state,
     });
-    window.location = `${'https://github.com/login/oauth/authorize?client_id=9cbfb21ec85ff80e7da7&redirect_uri='
-            + 'http://localhost:3000/&state='}${state}&scope=repo`;
+    window.location = `${'https://github.com/login/oauth/authorize?client_id=862222f107a099fa6750&redirect_uri='
+            + 'http://codelint.herokuapp.com/&state='}${state}&scope=repo`;
 }

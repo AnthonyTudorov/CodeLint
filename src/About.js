@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './home.css';
-import { makeStyles } from '@material-ui/core/styles';
 import Socket from './Socket';
 import Settings from './Settings'
 import GitHubIcon from '@material-ui/icons/GitHub';
@@ -16,9 +15,6 @@ export default function App() {
   const [fontSize, setFontSize] = useState(localStorage.getItem('font') || '14');
   const [windowheight, setWindowHeight] = useState(900)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-  // const technologies = [
-  //
-  // ]
 
   useEffect(() => {
     Socket.emit('is logged in');
