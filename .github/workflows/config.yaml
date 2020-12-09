@@ -27,11 +27,13 @@ jobs:
 
       - name: Run unmocked tests
         run: |
-          python ./tests/unmocked_unit_tests.py
+          cd tests
+          python unmocked_unit_tests.py
 
       - name: Run mocked tests
         run: |
-          python ./tests/mocked_unit_tests.py
+          cd tests
+          python mocked_unit_tests.py
 
       - name: Automatically Deploy
         env:
