@@ -7,10 +7,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function FormDialog({handleCommit}) {
+export default function FormDialog({ handleCommit }) {
   const [open, setOpen] = React.useState(false);
   const commitMessage = useRef('');
-  let DEFAULT_MESSAGE = "Lint using Codelint";
+  const DEFAULT_MESSAGE = 'Lint using Codelint';
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -19,17 +19,16 @@ export default function FormDialog({handleCommit}) {
   const handleClose = () => {
     commitMessage.current.focus();
     if (commitMessage.current.value) {
-        handleCommit(commitMessage.current.value);
-    }
-    else {
-        handleCommit(DEFAULT_MESSAGE);
+      handleCommit(commitMessage.current.value);
+    } else {
+      handleCommit(DEFAULT_MESSAGE);
     }
     setOpen(false);
   };
 
   return (
     <div>
-      <Button variant="contained" onClick={handleClickOpen} style={{ 'backgroundColor': '#0496FF', 'color': 'white'}}>
+      <Button variant="contained" onClick={handleClickOpen} style={{ backgroundColor: '#0496FF', color: 'white' }}>
         Commit
       </Button>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
@@ -43,7 +42,7 @@ export default function FormDialog({handleCommit}) {
             autoFocus
             margin="dense"
             id="name"
-            label={"Default: " + DEFAULT_MESSAGE}
+            label={`Default: ${DEFAULT_MESSAGE}`}
             type="email"
             inputRef={commitMessage}
             fullWidth

@@ -4,7 +4,7 @@ import subprocess
 import os
 import flask
 import flask_socketio
-from flask import request, session, redirect, url_for
+from flask import request, session
 from markupsafe import escape
 from githubOauth import auth_user, logout_user, get_user_data, get_user_repos
 from githubOauth import get_user_repo_tree, get_user_file_contents, commit_changes
@@ -17,6 +17,8 @@ socketio.init_app(app, cors_allowed_origins="*")
 states = set()
 # pylint: disable=wrong-import-position
 import models
+
+
 @app.route('/')
 def main():
     github_code = request.args.get('code')
@@ -27,10 +29,12 @@ def main():
         else:
             auth_user(github_code, state)
     return flask.render_template('index.html')
-    
+
+
 @app.route('/home')
 def about():
     return flask.render_template('index.html')
+
 
 @socketio.on('connect')
 def on_connect():
@@ -42,19 +46,28 @@ def on_connect():
 def on_disconnect():
     print(f"{request.sid} disconnected")
 
+
 @socketio.on('is logged in')
 def on_is_logged_in():
     if 'user_id' in session:
         user_id = escape(session.get('user_id'))
         if models.Users.query.filter_by(user_id=user_id).first() is not None:
-            socketio.emit('logged in status', {'logged_in': True, 'user_info': get_user_data(user_id)}, request.sid)
+            socketio.emit('logged in status', {
+                'logged_in': True,
+                'user_info': get_user_data(user_id)
+            }, request.sid)
     else:
-        socketio.emit('logged in status', {'logged_in': False, 'user_info': None}, request.sid)
+        socketio.emit('logged in status', {
+            'logged_in': False,
+            'user_info': None
+        }, request.sid)
+
 
 @socketio.on('logout')
 def on_logout():
     logout_user(escape(session['user_id']))
     socketio.emit('logout', request.sid)
+
 
 @socketio.on('store state')
 def on_store_state(data):
@@ -71,25 +84,31 @@ def on_get_repos(data):
 @socketio.on('get repo tree')
 def on_get_repo_tree(data):
     repo_tree = get_user_repo_tree(escape(session['user_id']),
-                data['repo_url'], data['default_branch'])
+                                   data['repo_url'], data['default_branch'])
     repo_tree["tab"] = data["index"]
     socketio.emit('repo tree', repo_tree, request.sid)
 
+
 @socketio.on('get file contents')
 def on_get_file_contents(data):
-    file_contents = get_user_file_contents(escape(session['user_id']), data['content_url'])
+    file_contents = get_user_file_contents(escape(session['user_id']),
+                                           data['content_url'])
     file_contents["tab"] = data["index"]
     socketio.emit('file contents', file_contents, request.sid)
-    
+
+
 @socketio.on('commit changes')
 def on_commit_changes(data):
-    commit_changes(escape(session['user_id']), data['repo_url'], data['default_branch'], data['files'], data['commit_message'])
+    commit_changes(escape(session['user_id']), data['repo_url'],
+                   data['default_branch'], data['files'],
+                   data['commit_message'])
+
 
 @socketio.on('lint')
 def code(data):
     file = make_file(data)
     if 'fix' in data:
-        res = lint_code(file, data,True)
+        res = lint_code(file, data, True)
         res['tab'] = data['index']
         socketio.emit('fixed', res, request.sid)
     else:
@@ -98,6 +117,7 @@ def code(data):
         socketio.emit('output', res, request.sid)
     subprocess.run(['rm', '-r', f'./userfiles/{res["filename"]}'])
     subprocess.run(['rm', '-r', f'./userfiles/.{res["filename"]}'])
+
 
 if __name__ == '__main__':
     models.db.create_all()
