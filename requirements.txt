@@ -32,3 +32,4 @@ Werkzeug==1.0.1
 wrapt==1.12.1
 yapf==0.30.0
 cryptography==3.2.1
+coverage==5.3
