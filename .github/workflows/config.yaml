@@ -25,15 +25,10 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run unmocked tests
+      - name: Run tests
         run: |
           cd tests
-          python unmocked_unit_tests.py
-
-      - name: Run mocked tests
-        run: |
-          cd tests
-          python mocked_unit_tests.py
+          coverage run -m --source=../ unittest *.py
 
       - name: Automatically Deploy
         env:
