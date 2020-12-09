@@ -107,7 +107,16 @@ If you don't have a Heroku account make one at https://signup.heroku.com/login.
 
 ## Work done by everyone:
 ### Anthony Tudorov
-  - 
+- Made session cookie to persist user session across refreshes
+- Secured cookie data using flask session options
+- Added logout backend logic
+- Added logout button and frontend logout logic
+- Added GitHub commit backend logic
+- Implemented commit button with commit message popup prompt
+- Access token encryption in database
+- Reworked unit testing to be >90% coverage
+- User is properly routed by implementing react router
+- Implemented process similar to a cron job to drop old records from database
 
 ### Rudra Desai
 - Made the landing page
@@ -122,10 +131,15 @@ If you don't have a Heroku account make one at https://signup.heroku.com/login.
 - Worked with Anthony to debug problems to deploy app on Heroku
 
 ### Joel Gonzalez
-- 
+- Created the landing/home page for the app.
+- Created the "About Us" section
+- Connected the landing page to the Codelint App itself via a "Get Started" button or something to that effect
+- Assisted in other areas of the app that needed attention.
 
 ### Chao-Yang Cheng
-- 
+- Implement Material-UI with Joel
+- Redesign database to store more data related to user's activity
+- Make developer section
 
 #### Things left to finish
 - Renaming tab names when user opens a file from GitHub
