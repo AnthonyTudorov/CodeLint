@@ -82,6 +82,7 @@ If you don't have a Heroku account make one at https://signup.heroku.com/login.
 8. You should get a link from your cli, click on that and check out your app!
 <hr />
 
+**Credit to: https://github.com/fireship-io/229-multi-level-dropdown/tree/master/src** for the navbar
 
 #### Issues faced:
 1. Implementing in app tabs was a little complicated. Rendering new tabs on new file click and opening that tab.
