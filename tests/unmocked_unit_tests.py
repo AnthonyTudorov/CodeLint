@@ -23,6 +23,28 @@ class unmocked(unittest.TestCase):
             socketio_test_client.disconnect()
             self.assertEqual(len(wholeApp.states), 0)
 
+    def test_logged_in(self):
+        flask_test_client = app.test_client()
+        socketio_test_client = socketio.test_client(app, flask_test_client=flask_test_client)
+        with patch('app.session', mock_methods.mock_session), \
+                patch('models.Users') as mock_models_data:
+            socketio_test_client.emit('is logged in')
+            res = socketio_test_client.get_received()[1]
+            self.assertEqual(res["name"], "logged in status")
+            
+    def test_logged_out(self):
+        flask_test_client = app.test_client()
+        socketio_test_client = socketio.test_client(app, flask_test_client=flask_test_client)
+        with patch('app.session', mock_methods.mock_session), \
+                patch('models.Users') as mock_models_data, \
+                patch('app.escape') as mock_escape, \
+                patch('app.logout_user') as mock_logout:
+            mock_escape.return_value = None
+            mock_logout.return_value = None
+            socketio_test_client.emit('logout')
+            res = socketio_test_client.get_received()[1]
+            self.assertEqual(res["name"], "logout")
+
     def test_store_state(self):
         flask_test_client = app.test_client()
         socketio_test_client = socketio.test_client(app, flask_test_client=flask_test_client)
@@ -33,25 +55,18 @@ class unmocked(unittest.TestCase):
         self.assertEqual('123456789' in wholeApp.states, True)
         wholeApp.states = set()
 
-    def test_auth_user(self):
-        flask_test_client = app.test_client()
-        socketio_test_client = socketio.test_client(app, flask_test_client=flask_test_client)
-        socketio_test_client.emit('auth user', {
-            'state': '123456789',
-            'code': '987654321'
-        })
-        res = socketio_test_client.get_received()[1]["args"][0]["message"]
-        self.assertEqual(res, 'state: 123456789 does not match any waiting states')
-
     def test_on_get_repos(self):
         flask_test_client = app.test_client()
         socketio_test_client = socketio.test_client(app, flask_test_client=flask_test_client)
-        with patch('app.get_user_repos') as mock_method:
-            mock_method.return_value = None
-            socketio_test_client.emit('get repos')
+        with patch('app.session', mock_methods.mock_session), \
+                patch('app.escape') as mock_escape, \
+                patch('app.get_user_repos') as mock_method:
+            mock_escape.return_value = None
+            mock_method.return_value = {}
+            socketio_test_client.emit('get repos', {'index': '0'})
             res = socketio_test_client.get_received()[1]
             self.assertEqual(res["name"], 'repos')
-            self.assertEqual(res["args"], [])
+            self.assertEqual(res["args"], [{'tab': '0'}])
 
     def test_get_repo_tree(self):
         flask_test_client = app.test_client()
@@ -60,12 +75,17 @@ class unmocked(unittest.TestCase):
                         'sha': '13a92d0084ce3312cb0150d0229fb9fa823a8f6d',
                         'size': 65,
                         'url': 'https://api.github.com/repos/rudra-desai/Codelint/git/blobs/'
-                               '13a92d0084ce3312cb0150d0229fb9fa823a8f6d'}
-        with patch('app.get_user_repo_tree') as mock_method:
+                               '13a92d0084ce3312cb0150d0229fb9fa823a8f6d'
+        }
+        with patch('app.session', mock_methods.mock_session), \
+                patch('app.escape') as mock_escape, \
+                patch('app.get_user_repo_tree') as mock_method:
+            mock_escape.return_value = None
             mock_method.return_value = mock_github_responses.tree_return
             socketio_test_client.emit('get repo tree', {
                 'repo_url': 'https://api.github.com/repos/AnthonyTudorov/BST-and-AVL-Tree-Comparison',
-                'default_branch': 'master'
+                'default_branch': 'master',
+                'index': '0'
             })
             res = socketio_test_client.get_received()[1]["args"][0]["tree"][0]
             self.assertEqual(res, expected_res)
@@ -74,10 +94,14 @@ class unmocked(unittest.TestCase):
         flask_test_client = app.test_client()
         socketio_test_client = socketio.test_client(app, flask_test_client=flask_test_client)
         expected_res = mock_github_responses.content_return["contents"]
-        with patch('app.get_user_file_contents') as mock_method:
+        with patch('app.session', mock_methods.mock_session), \
+                patch('app.escape') as mock_escape, \
+                patch('app.get_user_file_contents') as mock_method:
+            mock_escape.return_value = None
             mock_method.return_value = mock_github_responses.content_return
             socketio_test_client.emit('get file contents', {
-                'content_url': 'https://api.github.com/repos/rudra-desai/Codelint/git/blobs/209fc8690da1f2ab44168430793af982b56e7db1'
+                'content_url': 'https://api.github.com/repos/rudra-desai/Codelint/git/blobs/209fc8690da1f2ab44168430793af982b56e7db1',
+                'index': '0'
             })
             res = socketio_test_client.get_received()[1]["args"][0]["contents"]
             self.assertEqual(res, expected_res)
@@ -88,14 +112,15 @@ class unmocked(unittest.TestCase):
             res = lint.lint_code({
                 'linter': 'eslint',
                 'code': 'function test(){\nconsole.log("Hello")\n}',
-                'uuid': 'testfile'
-            })
+                'uuid': 'testfile',
+                'filename': 'testfile'
+            }, {'styleguide': 'airbnb'})
             here = os.path.dirname(os.path.abspath(__file__))
             here = re.sub(r'tests\/.*', "", here).replace("tests", "")
             subdir = "userfiles"
             filepath = os.path.join(here, subdir, "testfile.js")
             file = open(filepath, "r")
-            self.assertEqual(file.read(), 'function test(){\nconsole.log("Hello")\n}')
+            self.assertEqual(file.read(), 'function test(){\nconsole.log("Hello");\n}')
 
             flask_test_client = app.test_client()
             socketio_test_client = socketio.test_client(app, flask_test_client=flask_test_client)
@@ -103,7 +128,9 @@ class unmocked(unittest.TestCase):
                 mock_method.return_value = {
                     'filename': 'testfile.js'
                 }
-                socketio_test_client.emit('lint', {})
+                socketio_test_client.emit('lint', {'linter': 'pylint',
+                'code': 'def func():\n  print("Hello")',
+                'uuid': 'testfile','index': '0'})
                 res = socketio_test_client.get_received()[1]['args'][0]['filename']
                 self.assertEqual(res, 'testfile.js')
 
@@ -113,8 +140,9 @@ class unmocked(unittest.TestCase):
             res = lint.lint_code({
                 'linter': 'pylint',
                 'code': 'def func():\n  print("Hello")',
-                'uuid': 'testfile'
-            })
+                'uuid': 'testfile',
+                'filename': 'testfile'
+            }, {'styleguide': 'airbnb'})
             here = os.path.dirname(os.path.abspath(__file__))
             here = re.sub(r'tests\/.*', "", here).replace("tests", "")
             subdir = "userfiles"
@@ -128,7 +156,9 @@ class unmocked(unittest.TestCase):
                 mock_method.return_value = {
                     'filename': 'testfile.py'
                 }
-                socketio_test_client.emit('lint', {})
+                socketio_test_client.emit('lint', {'linter': 'pylint',
+                'code': 'def func():\n  print("Hello")',
+                'uuid': 'testfile','index': '0'})
                 res = socketio_test_client.get_received()[1]['args'][0]['filename']
                 self.assertEqual(res, 'testfile.py')
 
@@ -143,7 +173,7 @@ class unmocked(unittest.TestCase):
              patch("lint.re.sub") as mock_re_sub:
             mock_sub.return_value = None
             mock_re_sub = None
-            res = lint.eslint("eslint", "testfile.js")
+            res = lint.eslint("eslint", "testfile.js", "airbnb")
             self.assertEqual(res["linter"], "eslint")
 
 

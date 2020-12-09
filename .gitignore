@@ -8,3 +8,5 @@ __pycache__/
 htmlcov/*
 localtesting
 static/*.js
+!static/bundle.min.js
+static/a1a996746e5e48352c8111e2c01e698c.gif
